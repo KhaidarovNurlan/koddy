@@ -19,7 +19,7 @@ export function CompanyHeader() {
             <nav className="sticky top-0 z-50 bg-bg-darker border-b border-border-default/50">
                 <div className="max-w-7xl mx-auto px-4 h-15 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-5 group">
-                        <img src="/logo-text.svg" alt="Coddy" className="h-8 w-auto block" />
+                        <img src="/logo-text.svg" alt="Koddy" className="h-8 w-auto block" />
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 text-[18px] font-base opacity-90">
@@ -45,8 +45,8 @@ export function CompanyHeader() {
             <div className={`fixed inset-y-0 left-0 z-[70] w-[280px] bg-bg-dark border-r border-border-default transform transition-transform duration-300 md:hidden flex flex-col ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="p-6 border-b border-border-default/50 h-20 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-3">
-                        <img src="/logo.svg" alt="Coddy" className="h-8 w-auto" />
-                        <img src="/logo-text.svg" alt="Coddy" className="h-6 w-auto mt-3" />
+                        <img src="/logo.svg" alt="Koddy" className="h-8 w-auto" />
+                        <img src="/logo-text.svg" alt="Koddy" className="h-6 w-auto mt-3" />
                     </Link>
                 </div>
                 <div className="flex-1 overflow-y-auto py-4 flex flex-col">

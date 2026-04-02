@@ -7,6 +7,9 @@ import { MainLayout } from './components/MainLayout';
 import { CompanyLayout } from './components/CompanyLayout';
 import { Landing } from './pages/Landing';
 import { About } from './pages/About';
+import { Contact } from './pages/Contact';
+import { FAQs } from './pages/FAQs';
+import { AIAssistant } from './pages/AIAssistant';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -17,6 +20,9 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="/" element={<Landing />} />
                     <Route element={<CompanyLayout />}>
                         <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/faqs" element={<FAQs />} />
+                        <Route path="/ai_assistant" element={<AIAssistant />} />
                     </Route>
                 </Route>
             </Routes>

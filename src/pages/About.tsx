@@ -43,7 +43,7 @@ export function About() {
                             <div>
                                 <h2 className="text-3xl lg:text-[48px] text-white font-bold mb-4">Unlimited Content</h2>
                                 <p className="text-white/80 text-lg md:text-[20px] leading-relaxed">
-                                    Coddy delivers boundless content through collaboration with 3rd party creators and cutting edge Generative AI technology.
+                                    Koddy delivers boundless content through collaboration with 3rd party creators and cutting edge Generative AI technology.
                                 </p>
                             </div>
                         </div>

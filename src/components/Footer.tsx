@@ -6,9 +6,9 @@ const footerColumns = [
         links: [
             { name: 'Home', href: '/' },
             { name: 'About', href: '/about' },
-            { name: 'Contact', href: '/' },
-            { name: 'FAQs', href: '/' },
-            { name: 'AI Assistant', href: '/' },
+            { name: 'Contact', href: '/contact' },
+            { name: 'FAQs', href: '/faqs' },
+            { name: 'AI Assistant', href: '/ai_assistant' },
         ],
     },
     {
