@@ -66,8 +66,8 @@ export function FAQs() {
     ];
 
     return (
-        <div className="w-full min-h-screen font-sans flex flex-col bg-bg-darker">
-            <div className="relative py-16 md:py-24 overflow-hidden bg-koddy-blue flex flex-col items-center justify-center text-center px-4">
+        <div className="w-full min-h-screen font-sans flex flex-col bg-grey-dark">
+            <div className="relative py-16 md:py-24 overflow-hidden bg-blue flex flex-col items-center justify-center text-center px-4">
                 <div
                     className="absolute inset-0 z-0 opacity-30 bg-cover bg-center"
                     style={{ backgroundImage: 'url(/feature-background.svg)' }}
@@ -85,7 +85,7 @@ export function FAQs() {
             <div className="max-w-4xl w-full mx-auto px-6 py-12 md:py-16">
                 <div className="space-y-8">
                     {faqs.map((faq, index) => (
-                        <div key={index} className="border-b border-border-default pb-8 last:border-0 last:pb-0">
+                        <div key={index} className="border-b border-grey-lighter pb-8 last:border-0 last:pb-0">
                             <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
                                 {faq.question}
                             </h3>

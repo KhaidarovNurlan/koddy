@@ -9,7 +9,7 @@ export function About() {
         <div className="min-h-screen font-sans">
             <section className="py-24 md:py-40">
                 <div className="max-w-7xl mx-auto px-6 lg:ml-[19vw]">
-                    <h3 className="text-koddy-blue-light text-2xl mb-4 font-medium">Our Mission</h3>
+                    <h3 className="text-blue-light text-2xl mb-4 font-medium">Our Mission</h3>
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white font-medium auto-leading max-w-4xl" style={{ lineHeight: '1.2' }}>
                         Elevating code learning <br className="hidden md:block" />
                         to a <span className="font-extrabold pb-2">daily hobby</span>
@@ -17,7 +17,7 @@ export function About() {
                 </div>
             </section>
 
-            <section className="py-24 md:py-32 bg-koddy-blue-dark flex items-center">
+            <section className="py-24 md:py-32 bg-blue-dark flex items-center">
                 <div className="max-w-7xl mx-auto px-6">
                     <h3 className="text-white text-2xl mb-16 font-medium">Our Vision</h3>
 

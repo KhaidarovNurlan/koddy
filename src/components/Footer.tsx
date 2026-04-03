@@ -59,13 +59,13 @@ const socialLinks = [
 
 export function Footer() {
     return (
-        <footer className="bg-bg-darker">
+        <footer className="bg-grey-dark">
             <section className="relative pt-22 pb-36 overflow-hidden transition-all duration-700">
-                <div className="absolute inset-0 bg-koddy-blue-dark" />
+                <div className="absolute inset-0 bg-blue-dark" />
                 <div className="absolute inset-0 opacity-80" style={{ backgroundImage: 'url(/bottom-cta-bg-dark.svg)', backgroundSize: '80%', backgroundRepeat: 'no-repeat', backgroundPosition: 'bottom center' }} />
                 <div className="relative max-w-4xl mx-auto px-6 text-center">
                     <h2 style={{ fontFamily: "'Audiowide', cursive" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-12">Learn to code<br />with Koddy</h2>
-                    <Link to="/" className="inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-bg-dark text-koddy-blue-light font-semibold rounded-xl transition-all border-bg-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                    <Link to="/" className="inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-grey text-blue-light font-semibold rounded-xl transition-all border-grey-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
                         GET STARTED
                     </Link>
                 </div>
@@ -74,11 +74,11 @@ export function Footer() {
                 <div className="flex flex-row flex-wrap lg:flex-nowrap items-top justify-between gap-8 md:gap-3">
                     {footerColumns.map((col) => (
                         <div key={col.title} className="w-[45%] lg:w-auto">
-                            <h3 className="text-sm md:text-lg text-text-primary font-bold mb-4">{col.title}</h3>
+                            <h3 className="text-sm md:text-lg text-white font-bold mb-4">{col.title}</h3>
                             <ul className="space-y-2 mb-6">
                                 {col.links.map((link) => (
                                     <li key={link.name}>
-                                        <Link to={link.href} className="text-sm md:text-base text-text-secondary hover:text-koddy-blue transition-colors duration-200">
+                                        <Link to={link.href} className="text-sm md:text-base text-text-secondary hover:text-blue transition-colors duration-200">
                                             {link.name}
                                         </Link>
                                     </li>

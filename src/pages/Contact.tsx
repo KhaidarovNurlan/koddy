@@ -6,11 +6,11 @@ export function Contact() {
     }, []);
 
     return (
-        <div className="w-full min-h-[calc(100vh-60px)] font-sans flex items-center justify-center relative bg-bg-darker overflow-hidden py-16">
-            <div className="absolute right-0 top-0 bottom-0 w-[30%] xl:w-[35%] bg-koddy-blue hidden lg:block z-0"></div>
+        <div className="w-full min-h-[calc(100vh-60px)] font-sans flex items-center justify-center relative bg-grey-dark overflow-hidden py-16">
+            <div className="absolute right-0 top-0 bottom-0 w-[30%] xl:w-[35%] bg-blue hidden lg:block z-0"></div>
 
             <div className="max-w-6xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 relative z-10">
-                <div className="flex flex-col justify-center text-white space-y-8 lg:py-10 lg:pl-8">
+                <div className="flex flex-col items-center lg:items-start justify-center text-white space-y-8 lg:py-10 lg:pl-8">
                     <h1 className="text-5xl sm:text-6xl lg:text-[4rem] font-bold tracking-wide">
                         Let's Talk!
                     </h1>
@@ -18,7 +18,7 @@ export function Contact() {
                     <div className="h-[2px] w-full max-w-[250px] bg-[#373a3c] my-2"></div>
 
                     <div>
-                        <h3 className="text-koddy-blue-light text-sm tracking-wide font-medium mb-1">
+                        <h3 className="text-blue-light text-sm tracking-wide font-medium mb-1">
                             For Support
                         </h3>
                         <p className="text-xl sm:text-[22px] font-medium tracking-wide">
@@ -27,7 +27,7 @@ export function Contact() {
                     </div>
 
                     <div>
-                        <h3 className="text-koddy-blue-light text-sm tracking-wide font-medium mb-1">
+                        <h3 className="text-blue-light text-sm tracking-wide font-medium mb-1">
                             For Influencers/Affiliators
                         </h3>
                         <p className="text-xl sm:text-[22px] font-medium tracking-wide">
@@ -36,21 +36,21 @@ export function Contact() {
                     </div>
 
                     <div>
-                        <h3 className="text-koddy-blue-light text-sm tracking-wide font-medium mb-3">
+                        <h3 className="text-blue-light text-sm tracking-wide font-medium mb-3">
                             Follow Us
                         </h3>
                         <div className="flex gap-4 items-center">
-                            <a href="#" className="hover:opacity-80 transition-opacity flex items-center justify-center">
+                            <a href="https://github.com/KhaidarovNurlan" rel="noopener noreferrer" target="_blank" className="hover:opacity-80 transition-opacity flex items-center justify-center">
                                 <img src="/github.svg" alt="GitHub" className="w-5 h-5 sm:w-6 sm:h-6" />
                             </a>
-                            <a href="#" className="hover:opacity-80 transition-opacity flex items-center justify-center">
+                            <a href="https://www.linkedin.com/in/nurlankhaidarov" rel="noopener noreferrer" target="_blank" className="hover:opacity-80 transition-opacity flex items-center justify-center">
                                 <img src="/linkedin.svg" alt="LinkedIn" className="w-5 h-5 sm:w-6 sm:h-6" />
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-bg-dark rounded-xl p-8 sm:p-10 shadow-2xl border border-border-default w-full max-w-xl mx-auto flex flex-col justify-between">
+                <div className="bg-grey rounded-xl p-8 sm:p-10 shadow-2xl border border-grey-lighter w-full max-w-xl mx-auto flex flex-col justify-between">
                     <div className="space-y-5">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -61,7 +61,7 @@ export function Contact() {
                             </div>
                             <input
                                 type="text"
-                                className="w-full bg-transparent border border-border-default rounded-md py-3 pl-11 pr-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 transition-colors"
+                                className="w-full bg-transparent border border-grey-lighter rounded-md py-3 pl-11 pr-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 transition-colors"
                                 placeholder="Full Name"
                             />
                         </div>
@@ -75,14 +75,14 @@ export function Contact() {
                             </div>
                             <input
                                 type="email"
-                                className="w-full bg-transparent border border-border-default rounded-md py-3 pl-11 pr-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 transition-colors"
+                                className="w-full bg-transparent border border-grey-lighter rounded-md py-3 pl-11 pr-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 transition-colors"
                                 placeholder="Email Address"
                             />
                         </div>
 
                         <div>
                             <textarea
-                                className="w-full bg-transparent border border-border-default rounded-md py-3 px-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 min-h-[160px] resize-none transition-colors"
+                                className="w-full bg-transparent border border-grey-lighter rounded-md py-3 px-4 text-white placeholder-text-secondary focus:outline-none focus:border-gray-500 min-h-[160px] resize-none transition-colors"
                                 placeholder="Message"
                             ></textarea>
                         </div>
@@ -94,7 +94,7 @@ export function Contact() {
                         <div className="space-y-4 mb-8">
                             <label className="flex items-start gap-3 cursor-pointer group">
                                 <div className="min-w-4 flex items-center justify-center mt-1">
-                                    <input type="checkbox" className="w-[18px] h-[18px] rounded-[4px] border border-border-default bg-transparent text-koddy-blue focus:ring-0 cursor-pointer appearance-none checked:bg-koddy-blue-dark checked:border-koddy-blue-dark relative checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[5px] checked:after:w-1.5 checked:after:h-2.5 checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" />
+                                    <input type="checkbox" className="w-[18px] h-[18px] rounded-[4px] border border-grey-lighter bg-transparent text-blue focus:ring-0 cursor-pointer appearance-none checked:bg-blue-dark checked:border-blue-dark relative checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[5px] checked:after:w-1.5 checked:after:h-2.5 checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" />
                                 </div>
                                 <span className="text-[14px] leading-snug text-gray-200">
                                     For assistance with specific challenges, use the support tab within the challenge.
@@ -103,7 +103,7 @@ export function Contact() {
 
                             <label className="flex items-start gap-3 cursor-pointer group">
                                 <div className="min-w-4 flex items-center justify-center mt-1">
-                                    <input type="checkbox" className="w-[18px] h-[18px] rounded-[4px] border border-border-default bg-transparent text-koddy-blue focus:ring-0 cursor-pointer appearance-none checked:bg-koddy-blue-dark checked:border-koddy-blue-dark relative checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[5px] checked:after:w-1.5 checked:after:h-2.5 checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" />
+                                    <input type="checkbox" className="w-[18px] h-[18px] rounded-[4px] border border-grey-lighter bg-transparent text-blue focus:ring-0 cursor-pointer appearance-none checked:bg-blue-dark checked:border-blue-dark relative checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[5px] checked:after:w-1.5 checked:after:h-2.5 checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" />
                                 </div>
                                 <span className="text-[14px] leading-snug text-gray-200">
                                     Subscription details and cancellation are in <span className="font-semibold text-white">billing settings</span> on your <a href="#" className="underline text-gray-200 hover:text-white transition-colors">profile page</a>..
@@ -112,7 +112,7 @@ export function Contact() {
                         </div>
 
                         <div className="flex justify-end">
-                            <button className="bg-koddy-blue-dark hover:brightness-110 transition-all text-gray-300 hover:text-white text-sm font-semibold rounded-lg py-3 px-6 uppercase tracking-wider shadow-md">
+                            <button className="bg-blue-dark hover:brightness-110 transition-all text-gray-300 hover:text-white text-sm font-semibold rounded-lg py-3 px-6 uppercase tracking-wider shadow-md">
                                 SEND MESSAGE
                             </button>
                         </div>

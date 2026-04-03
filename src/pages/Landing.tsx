@@ -30,10 +30,10 @@ const codeSnippets: Record<string, { language: string; lines: { text: string; co
         language: 'Python',
         lines: [
             { text: '# Write your first program', color: 'text-text-muted' },
-            { text: 'name = input("What is your name? ")', color: 'text-koddy-blue-light' },
+            { text: 'name = input("What is your name? ")', color: 'text-blue-light' },
             { text: 'print(f"Hello, {name}!")', color: 'text-emerald-400' },
             { text: '', color: '' },
-            { text: 'age = int(input("Your age: "))', color: 'text-koddy-blue-light' },
+            { text: 'age = int(input("Your age: "))', color: 'text-blue-light' },
             { text: 'days = age * 365', color: 'text-amber-300' },
             { text: 'print(f"You are {days} days old!")', color: 'text-emerald-400' },
         ],
@@ -42,7 +42,7 @@ const codeSnippets: Record<string, { language: string; lines: { text: string; co
         language: 'PostgreSQL',
         lines: [
             { text: 'SELECT name, score', color: 'text-purple-400' },
-            { text: 'FROM students', color: 'text-koddy-blue-light' },
+            { text: 'FROM students', color: 'text-blue-light' },
             { text: 'WHERE score > 90', color: 'text-amber-300' },
             { text: 'ORDER BY score DESC', color: 'text-emerald-400' },
             { text: 'LIMIT 10;', color: 'text-pink-400' },
@@ -113,8 +113,8 @@ function LearnByDoing() {
                     </p>
                 </div>
                 <div className="md:w-1/2 w-full">
-                    <div className="rounded-2xl bg-bg-dark border border-border-default overflow-hidden shadow-2xl shadow-black/30">
-                        <div className="flex items-center gap-1 px-3 pt-3 pb-0 bg-bg-darker/50 overflow-x-auto scrollbar-hide border-b border-border-default/50">
+                    <div className="rounded-2xl bg-grey border-2 border-grey-lighter overflow-hidden shadow-2xl shadow-black/30">
+                        <div className="flex items-center gap-1 px-3 pt-3 pb-0 bg-grey-dark/50 overflow-x-auto scrollbar-hide border-b-2 border-grey-lighter/50">
                             <div className="flex gap-1.5 mr-3 mb-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500/60" />
                                 <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
@@ -128,17 +128,17 @@ function LearnByDoing() {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`relative group flex items-center gap-1.5 px-4 py-2.5 rounded-t-lg text-xs font-semibold transition-all duration-200 overflow-hidden ${isActive
-                                            ? 'bg-bg-dark border-t border-x border-border-default'
+                                            ? 'bg-grey border-t border-x border-grey-lighter'
                                             : 'text-text-muted hover:text-text-secondary hover:bg-bg-card/30'
                                             }`}
                                     >
                                         <img src={tab.icon} alt={tab.label} className={`w-4 h-4 transition-opacity ${isActive ? 'opacity-100' : 'opacity-50'}`} />
                                         <span>{tab.label}</span>
 
-                                        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-border-default/30">
+                                        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-grey-lighter/30">
                                             {isActive && (
                                                 <div
-                                                    className="h-full bg-koddy-blue transition-all duration-100 ease-linear"
+                                                    className="h-full bg-blue transition-all duration-100 ease-linear"
                                                     style={{ width: `${progress}%` }}
                                                 />
                                             )}
@@ -172,10 +172,10 @@ function CodingStreak() {
     const { ref, isVisible } = useInView();
 
     return (
-        <section ref={ref} className={`py-20 md:py-28 bg-bg-dark transition-all duration-700 ${isVisible ? 'section-visible' : 'section-hidden'}`}>
+        <section ref={ref} className={`py-20 md:py-28 bg-grey transition-all duration-700 ${isVisible ? 'section-visible' : 'section-hidden'}`}>
             <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="md:w-1/2 w-full max-w-md">
-                    <div className="rounded-2xl bg-bg-darker border border-border-default p-6 shadow-2xl shadow-black/20">
+                    <div className="rounded-2xl bg-grey-dark border border-grey-lighter p-6 shadow-2xl shadow-black/20">
                         <div className="flex items-center gap-3 mb-2">
                             <img src="/fire-filled.svg" alt="Streak" className="w-8 h-8 animate-pulse-fire" />
                             <div><div className="text-2xl font-bold">12 days streak</div></div>
@@ -195,17 +195,17 @@ function CodingStreak() {
                                     return (
                                         <div key={day} className="relative flex items-center justify-center">
                                             {isToday && (
-                                                <div className="absolute inset-0 rounded-3xl ring-1 ring-streak-orange/60 animate-ping" />
+                                                <div className="absolute inset-0 rounded-3xl ring-1 ring-orange/60 animate-ping" />
                                             )}
 
                                             <div className={`relative w-9 h-9 rounded-3xl flex items-center justify-center text-xs font-medium transition-all duration-200
                                                 ${isToday
-                                                    ? 'text-white ring-2 ring-streak-orange/40 shadow-lg shadow-streak-orange/20'
+                                                    ? 'text-white ring-2 ring-orange/40 shadow-lg shadow-orange/20'
                                                     : isFrozen
-                                                        ? 'bg-sky-500/20 text-sky-400'
+                                                        ? 'bg-blue-light text-white/75'
                                                         : isActive
-                                                            ? 'bg-streak-orange/20 text-streak-orange'
-                                                            : 'bg-bg-card/30 text-text-muted'
+                                                            ? 'bg-orange text-white/75'
+                                                            : 'text-text-muted'
                                                 }`}
                                             >
                                                 {day}
@@ -216,14 +216,14 @@ function CodingStreak() {
                             </div>
                         </div>
                         <div className="flex gap-3">
-                            <div className="flex-1 bg-bg-card/50 rounded-xl p-3 border border-border-default hover:bg-bg-card-hover transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
+                            <div className="flex-1 bg-bg-card/50 rounded-xl p-3 border border-grey-lighter hover:bg-bg-card-hover transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
                                 <div className="flex items-center gap-2 mb-1">
                                     <img src="/product_double_or_nothing.svg" alt="" className="w-6 h-6" />
                                     <span className="text-xs font-semibold">Double or Nothing</span>
                                 </div>
                                 <p className="text-[15px] text-text-secondary">Day 5 of 7</p>
                             </div>
-                            <div className="flex-1 bg-bg-card/50 rounded-xl p-3 border border-border-default hover:bg-bg-card-hover transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
+                            <div className="flex-1 bg-bg-card/50 rounded-xl p-3 border border-grey-lighter hover:bg-bg-card-hover transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
                                 <div className="flex items-center gap-2 mb-1">
                                     <img src="/fire-freeze-white-dark.svg" alt="" className="w-6 h-6" />
                                     <span className="text-xs font-semibold">Streak Freeze</span>
@@ -253,23 +253,23 @@ function Leaderboard() {
                     <p className="text-base md:text-xl leading-relaxed max-w-md">Compete on global leaderboards, invite friends to earn rewards, and celebrate each other's wins. Coding is better with friends!</p>
                 </div>
                 <div className="md:w-1/2 w-full max-w-md">
-                    <div className="rounded-2xl bg-bg-dark border border-border-default overflow-hidden shadow-2xl shadow-black/20">
-                        <div className="px-5 py-4 flex items-center gap-3 border-b border-border-default bg-bg-darker/50">
+                    <div className="rounded-2xl bg-grey border border-grey-lighter overflow-hidden shadow-2xl shadow-black/20">
+                        <div className="px-5 py-4 flex items-center gap-3 border-b border-grey-lighter bg-grey-dark/50">
                             <img src="/challenger.svg" alt="Challenger" className="w-16 h-16" />
-                            <div><div className="text-lg font-bold text-koddy-blue">Challenger League</div><div className="text-base ">Top 7 advance</div></div>
+                            <div><div className="text-lg font-bold text-blue">Challenger League</div><div className="text-base ">Top 7 advance</div></div>
                         </div>
                         <div className="px-3 py-2">
                             {leaderboardUsers.map((user, i) => (
                                 <div key={user.rank} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 hover:bg-bg-card/50 ${i < 3 ? 'hover:-translate-y-0.5' : ''}`}>
                                     <div className="w-6 flex-shrink-0">{user.badge ? <div className="relative flex items-center justify-center w-7 h-7"><img src={user.badge} alt={`${user.rank}`} className="w-full h-auto" /><span className="absolute inset-0 flex items-center justify-center text-sm font-semibold">{user.rank}</span></div> : <span className="text-sm font-semibold flex items-center justify-center">{user.rank}</span>}</div>
-                                    <img src={user.avatar} alt={user.name} className="w-9 h-9 rounded-full object-cover border-2 border-border-default" />
+                                    <img src={user.avatar} alt={user.name} className="w-9 h-9 rounded-full object-cover border-2 border-grey-lighter" />
                                     <span className="text-lg font-medium flex-1">{user.name}</span>
                                     <div className="flex items-center gap-1"><span className="text-sm font-semibold text-text-secondary">{user.xp.toLocaleString()} XP</span></div>
                                 </div>
                             ))}
                         </div>
                         <div className="px-5 py-2  flex items-center justify-center gap-2">
-                            <img src="/arrow-up.svg" alt="" className="w-3 h-3" /><span className="text-[10px] font-semibold text-promotion-green uppercase tracking-wider">Promotion Zone</span><img src="/arrow-up.svg" alt="" className="w-3 h-3" />
+                            <img src="/arrow-up.svg" alt="" className="w-3 h-3" /><span className="text-[10px] font-semibold text-[#07AA0D] uppercase tracking-wider">Promotion Zone</span><img src="/arrow-up.svg" alt="" className="w-3 h-3" />
                         </div>
                     </div>
                 </div>
@@ -300,7 +300,7 @@ export function Landing() {
 
     return (
         <div className="min-h-screen">
-            <nav className={`sticky top-0 z-50 bg-bg-darker transition-all duration-300 ${isScrolled ? 'border-b-3 border-border-default' : 'border-b-0 border-transparent'
+            <nav className={`sticky top-0 z-50 bg-grey-dark transition-all duration-300 ${isScrolled ? 'border-b-3 border-grey-lighter' : 'border-b-0 border-transparent'
                 }`}>
                 <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between relative">
 
@@ -330,7 +330,7 @@ export function Landing() {
 
                     <Link
                         to="/"
-                        className={`btn-shimmer items-center justify-center px-10 cursor-pointer transition-all bg-koddy-blue text-white font-semibold py-2.5 rounded-xl border-koddy-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px] ${isScrolled
+                        className={`btn-shimmer items-center justify-center px-10 cursor-pointer transition-all bg-blue text-white font-semibold py-2.5 rounded-xl border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px] ${isScrolled
                             ? 'flex animate-in fade-in zoom-in duration-300'
                             : 'hidden sm:flex'
                             }`}
@@ -357,10 +357,10 @@ export function Landing() {
                         </p>
 
                         <div className="flex flex-col gap-3 mt-2 w-full max-w-sm">
-                            <Link to="/" className="btn-shimmer inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-koddy-blue text-white font-semibold rounded-xl transition-all border-koddy-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                            <Link to="/" className="btn-shimmer inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-blue text-white font-semibold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
                                 GET STARTED
                             </Link>
-                            <Link to="/" className="inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-bg-dark text-koddy-blue-light font-semibold rounded-xl transition-all border-bg-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                            <Link to="/login" className="inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-grey text-blue-light font-semibold rounded-xl transition-all border-grey-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
                                 I ALREADY HAVE AN ACCOUNT
                             </Link>
                         </div>
@@ -368,7 +368,7 @@ export function Landing() {
                 </div>
             </section>
 
-            <div className="relative bg-bg-dark overflow-hidden">
+            <div className="relative bg-grey overflow-hidden">
                 <div className="marquee-container flex items-center py-2 h-22">
                     <div className="flex items-center gap-14 animate-marquee whitespace-nowrap min-w-full">
                         {[...languages, ...languages].map((lang, i) => (

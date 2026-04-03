@@ -1,26 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-    --color-bg-light: #494d50;
-    --color-bg-dark: #2d2e2f;
-    --color-bg-darker: #212829;
+    --color-grey: #2B2D2E;
+    --color-grey-dark: #252627;
+    --color-grey-light: #494D50;
+    --color-grey-lighter: #3B3E41;
 
-    --color-koddy-blue: #1b78a0;
-    --color-koddy-blue-dark: #264d73;
-    --color-koddy-blue-light: #3dbae8;
-    --color-text-primary: #ffffff;
+    --color-blue: #1B78A0;
+    --color-blue-dark: #264D73;
+    --color-blue-light: #548BCC;
+
     --color-text-secondary: #9ca3af;
     --color-text-muted: #6b7280;
-    --color-border-default: #373a3c;
 
-    --color-streak-orange: #f59e0b;
-    --color-streak-fire: #ef4444;
-    --color-success: #10b981;
-    --color-promotion-green: #22c55e;
-    --color-danger: #ef4444;
-    --color-gold: #fbbf24;
-    --color-silver: #9ca3af;
-    --color-bronze: #d97706;
+    --color-orange: #A35700;
 
     --font-sans: 'Varela Round', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
@@ -79,8 +72,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: var(--font-sans);
-    background-color: var(--color-bg-darker);
-    color: var(--color-text-primary);
+    background-color: var(--color-grey-dark);
+    color: var(--color-white);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -119,11 +112,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--color-bg-dark);
+    background: var(--color-grey);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--color-bg-light);
+    background: var(--color-grey-light);
     border-radius: 22px;
 }
 

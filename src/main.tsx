@@ -10,12 +10,15 @@ import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { FAQs } from './pages/FAQs';
 import { AIAssistant } from './pages/AIAssistant';
+import { NotFound } from './pages/NotFound';
+import { Login } from './pages/Login';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
             <ScrollToTop />
             <Routes>
+                <Route path="/login" element={<Login />} />
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<Landing />} />
                     <Route element={<CompanyLayout />}>
@@ -23,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/faqs" element={<FAQs />} />
                         <Route path="/ai_assistant" element={<AIAssistant />} />
+                        <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
             </Routes>
