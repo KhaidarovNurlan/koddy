@@ -1,12 +1,42 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function Login() {
     useEffect(() => {
         document.title = "Login & Register - Koddy";
     }, []);
 
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            const endpoint = activeTab === 'login' ? '/api/auth/login' : '/api/auth/register';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            
+            if (!response.ok) {
+                setError(data.error || 'An error occurred');
+            } else {
+                localStorage.setItem('token', data.token);
+                navigate('/journeys');
+            }
+        } catch (err) {
+            setError('Failed to connect to the server');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#166085] flex flex-col font-sans">
@@ -39,6 +69,8 @@ export function Login() {
                             <img src="/email.svg" alt="Email" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 opacity-80 w-6 h-6" />
                             <input
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Email Address"
                                 className="w-full bg-grey-dark border-2 border-grey-lighter rounded-xl px-12 py-3.5 text-base text-white placeholder-text-muted focus:outline-none focus:border-[#3dbae8] transition-colors shadow-inner"
                             />
@@ -47,14 +79,20 @@ export function Login() {
                             <img src="/password.svg" alt="Password" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 opacity-80 w-6 h-6" />
                             <input
                                 type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
                                 className="w-full bg-grey-dark border-2 border-grey-lighter rounded-xl px-12 py-3.5 text-base text-white placeholder-text-muted focus:outline-none focus:border-[#3dbae8] transition-colors shadow-inner"
                             />
                         </div>
                     </div>
 
-                    <button className="w-full mt-5 inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-blue text-white font-semibold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
-                        {activeTab === 'login' ? 'LOG IN' : 'CREATE ACCOUNT'}
+                    {error && <div className="text-red-500 mt-3 text-sm text-center font-medium">{error}</div>}
+                    <button 
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="w-full mt-5 inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-blue text-white font-semibold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed">
+                        {loading ? 'LOADING...' : (activeTab === 'login' ? 'LOG IN' : 'CREATE ACCOUNT')}
                     </button>
 
                     {activeTab === 'login' && (

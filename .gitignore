@@ -1,4 +1,7 @@
 .vscode
 
+TODO.md
+.env
+
 node_modules
 bun.lock

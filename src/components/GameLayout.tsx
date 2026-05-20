@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -8,22 +8,11 @@ const NAV_ITEMS = [
     { name: "Goals", icon: "/daily-challenges.svg", path: "/" },
     { name: "Leaderboard", icon: "/leaderboard.svg", path: "/" },
     { name: "Store", icon: "/store.svg", path: "/" },
-    { name: "Profile", icon: "/profile.svg", path: "/" },
+    { name: "Profile", icon: "/profile.svg", path: "/profile" },
 ];
 
 export const GameLayout = () => {
-    const [moreOpen, setMoreOpen] = useState(false);
     const moreMenuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-                setMoreOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -51,9 +40,8 @@ export const GameLayout = () => {
                         </NavLink>
                     ))}
 
-                    <div className="relative" ref={moreMenuRef}>
+                    <div className="relative group" ref={moreMenuRef}>
                         <button
-                            onClick={() => setMoreOpen(!moreOpen)}
                             className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors hover:bg-grey/60"
                         >
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
@@ -62,28 +50,21 @@ export const GameLayout = () => {
                             <span className="text-[18px] flex-1 text-left">More</span>
                         </button>
 
-                        {moreOpen && (
-                            <div className="absolute left-full -bottom-16 mr-8 w-56 bg-grey-dark border-3 border-grey-light rounded-2xl shadow-2xl py-2 z-50">
-                                <Link to="/" className="flex items-center gap-3 px-5 py-2 hover:bg-white/5" onClick={() => setMoreOpen(false)}>
-                                    <img src="/notification-white.svg" alt="" className="w-6 h-6" />
-                                    <span>Notifications</span>
-                                </Link>
-                                <Link to="/" className="flex items-center gap-3 px-5 py-2 hover:bg-white/5" onClick={() => setMoreOpen(false)}>
-                                    <img src="/challenge-white.svg" alt="" className="w-6 h-6" />
-                                    <span>Challenges</span>
-                                </Link>
-                                <Link to="/" className="flex items-center justify-between px-5 py-2 hover:bg-white/5" onClick={() => setMoreOpen(false)}>
-                                    <div className="flex items-center gap-3">
-                                        <img src="/course-white.svg" alt="" className="w-6 h-6" />
-                                        <span>Courses</span>
-                                    </div>
-                                    <img src="/open-in-new-tab-white.svg" alt="" className="w-4 h-4" />
-                                </Link>
-                                <div className="h-px bg-white/25 my-1 mx-3"></div>
-                                <Link to="/settings" className="block px-5 py-2 hover:bg-white/5" onClick={() => setMoreOpen(false)}>Settings</Link>
-                                <button className="w-full text-left px-5 py-2 hover:bg-white/5" onClick={() => setMoreOpen(false)}>Logout</button>
-                            </div>
-                        )}
+                        <div className="absolute left-full -bottom-16 mr-8 w-56 bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl py-2 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <Link to="/" className="flex items-center gap-3 px-5 py-2 hover:bg-white/5">
+                                <img src="/challenge-white.svg" alt="" className="w-6 h-6" />
+                                <span>Challenges</span>
+                            </Link>
+                            <Link to="/" className="flex items-center justify-between px-5 py-2 hover:bg-white/5">
+                                <div className="flex items-center gap-3">
+                                    <img src="/course-white.svg" alt="" className="w-6 h-6" />
+                                    <span>Courses</span>
+                                </div>
+                            </Link>
+                            <div className="h-px bg-white/25 my-1 mx-3"></div>
+                            <Link to="/settings" className="block px-5 py-2 hover:bg-white/5">Notifications</Link>
+                            <button className="w-full text-left px-5 py-2 hover:bg-white/5">Logout</button>
+                        </div>
                     </div>
                 </nav>
             </aside>
@@ -104,7 +85,7 @@ export const GameLayout = () => {
                                 }`
                             }
                         >
-                            <img src={item.icon} alt={item.name} className="w-7 h-7 object-contain" />
+                            <img src={item.icon} alt={item.name} className="w-10 h-10 object-contain" />
                         </NavLink>
                     );
                 })}

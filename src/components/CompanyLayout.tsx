@@ -31,7 +31,7 @@ export function CompanyLayout() {
 
                     <div className="flex items-center gap-6">
                         <Link to="/login" className="hover:text-blue transition-colors text-[18px] font-base hidden md:block opacity-90">Login</Link>
-                        <Link to="/" className="hidden md:block btn-shimmer items-center justify-center px-6 text-[14px] cursor-pointer transition-all bg-blue font-semibold py-1.5 rounded-xl border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                        <Link to="/" className="hidden md:block btn-shimmer items-center justify-center px-6 text-[14px] transition-all bg-blue font-semibold py-1.5 rounded-xl border-blue-dark shadow-[0_5px_0_0_#264D73] hover:shadow-[0_0px_0_0_#264D73] hover:translate-y-[3px]">
                             GET STARTED
                         </Link>
                         <button className="md:hidden block p-2 -mr-2 text-text-muted hover:text-white transition-colors" onClick={() => setIsMenuOpen(true)}>

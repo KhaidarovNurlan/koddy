@@ -330,7 +330,7 @@ export function Landing() {
 
                     <Link
                         to="/"
-                        className={`btn-shimmer items-center justify-center px-10 cursor-pointer transition-all bg-blue text-white font-semibold py-2.5 rounded-xl border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px] ${isScrolled
+                        className={`btn-shimmer items-center justify-center px-10 transition-all bg-blue text-white font-semibold py-2.5 rounded-xl border-blue-dark border-b-5 hover:border-b-2 hover:translate-y-[3px] ${isScrolled
                             ? 'flex animate-in fade-in zoom-in duration-300'
                             : 'hidden sm:flex'
                             }`}
@@ -357,10 +357,10 @@ export function Landing() {
                         </p>
 
                         <div className="flex flex-col gap-3 mt-2 w-full max-w-sm">
-                            <Link to="/" className="btn-shimmer inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-blue text-white font-semibold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                            <Link to="/" className="btn-shimmer inline-flex items-center justify-center px-10 py-2.5 bg-blue text-white font-semibold rounded-xl transition-all shadow-[0_5px_0_0_#264D73] hover:shadow-[0_0px_0_0_#264D73] hover:translate-y-[3px]">
                                 GET STARTED
                             </Link>
-                            <Link to="/login" className="inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-grey text-blue-light font-semibold rounded-xl transition-all border-grey-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
+                            <Link to="/login" className="inline-flex items-center justify-center px-10 py-2.5 bg-grey text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
                                 I ALREADY HAVE AN ACCOUNT
                             </Link>
                         </div>
