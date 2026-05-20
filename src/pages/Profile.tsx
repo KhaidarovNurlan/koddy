@@ -6,17 +6,6 @@ function MyProfile() {
 
     return (
         <>
-            <div className="lg:hidden flex items-center justify-between mb-6 border-b-3 border-grey-light p-3 pt-6">
-                <h1 className="text-xl font-bold text-text-secondary">Profile</h1>
-                <div className="flex items-center gap-4">
-                    <Link to="/profile?p=search" className="hover:opacity-80 transition-opacity">
-                        <img src="/search-white.svg" alt="Search friends" className="w-6 h-6 opacity-80" />
-                    </Link>
-                    <Link to="/user/nurlan" target="_blank" className="hover:opacity-80 transition-opacity">
-                        <img src="/resume-white.svg" alt="Public profile" className="w-6 h-6 opacity-80" />
-                    </Link>
-                </div>
-            </div>
             <div className="flex-1 p-8 w-full max-w-[700px]">
                 <div className="bg-avatar-bg-default h-72 rounded-2xl relative">
                     <button
@@ -220,29 +209,22 @@ function MyProfile() {
 
 function SearchFriends() {
     return (
-        <>
-            <div className="lg:hidden flex items-center justify-between mb-6 border-b-3 border-grey-light p-3 pt-6">
-                <Link to="/profile" className="hover:opacity-80 transition-opacity">
-                    <img src="/left-white.svg" alt="Back" className="w-6 h-6 opacity-50" />
-                </Link>
-                <h1 className="text-xl font-bold text-text-secondary w-full text-center">Search friends</h1>
-            </div>
-            <div className="flex-1 p-8 w-full max-w-[700px]">
-                <Link to="/profile" className="hidden lg:flex items-center gap-2 text-white text-lg mb-6 hover:opacity-80">
-                    <img src="/left-white.svg" alt="Back" className="w-6 h-6" />
-                    Back
-                </Link>
+        <div className="flex-1 p-8 w-full max-w-[700px]">
+            <Link to="/profile" className="hidden lg:flex items-center gap-2 text-white text-lg mb-6 hover:opacity-80">
+                <img src="/left-white.svg" alt="Back" className="w-6 h-6" />
+                Back
+            </Link>
 
-                <div className="relative mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search by name..."
-                        className="w-full bg-grey border-3 border-grey-light rounded-xl py-3 px-4 text-white placeholder-text-secondary outline-none focus:border-blue-light transition-colors"
-                    />
-                    <img src="/search-white.svg" alt="Search" className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 opacity-75" />
-                </div>
-                {/* There will be all relevant users */}
-                {/* <div className="flex flex-col gap-3">
+            <div className="relative mb-6">
+                <input
+                    type="text"
+                    placeholder="Search by name..."
+                    className="w-full bg-grey border-3 border-grey-light rounded-xl py-3 px-4 text-white placeholder-text-secondary outline-none focus:border-blue-light transition-colors"
+                />
+                <img src="/search-white.svg" alt="Search" className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 opacity-75" />
+            </div>
+            {/* There will be all relevant users */}
+            {/* <div className="flex flex-col gap-3">
                     {users.map((user, i) => (
                         <div key={i} className="flex items-center justify-between p-4 bg-[#242627] border border-[#3b3d3f] rounded-xl hover:border-blue/30 transition-colors">
                             <div className="flex items-center gap-4">
@@ -257,9 +239,7 @@ function SearchFriends() {
                         </div>
                     ))}
                 </div> */}
-            </div>
-
-        </>
+        </div>
     );
 }
 

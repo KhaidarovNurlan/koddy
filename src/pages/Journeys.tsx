@@ -26,7 +26,7 @@ export const Journeys = () => {
 
     return (
         <div className="p-6 md:p-10 max-w-[1200px] w-full mx-auto">
-            <h1 className="text-2xl font-medium mb-8">Coding Journeys</h1>
+            <h1 className="text-[20px] font-bold mb-8">Coding Journeys</h1>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {LANGUAGES.map((lang) => (

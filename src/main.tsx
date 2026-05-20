@@ -6,7 +6,6 @@ import ScrollToTop from './components/ScrollToTop';
 import { MainLayout } from './components/MainLayout';
 import { CompanyLayout } from './components/CompanyLayout';
 import { GameLayout } from './components/GameLayout';
-import { GameStatsLayout } from './components/GameStatsLayout';
 import { Landing } from './pages/Landing';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
@@ -17,6 +16,12 @@ import { Login } from './pages/Login';
 import { Journeys } from './pages/Journeys';
 import { Profile } from './pages/Profile';
 import { User } from './pages/User';
+import { Notifications } from './pages/Notifications';
+import { Leaderboard } from './pages/Leaderboard';
+import { Goals } from './pages/Goals';
+import { Projects } from './pages/Projects';
+import { Challenges } from './pages/Challenges';
+import { Store } from './pages/Store';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 createRoot(document.getElementById('root')!).render(
@@ -28,9 +33,13 @@ createRoot(document.getElementById('root')!).render(
                 <Route element={<ProtectedRoute />}>
                     <Route element={<GameLayout />}>
                         <Route path="/journeys" element={<Journeys />} />
-                        <Route element={<GameStatsLayout />}>
-                            <Route path="/profile" element={<Profile />} />
-                        </Route>
+                        <Route path="/challenges" element={<Challenges />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/leaderboard" element={<Leaderboard />} />
+                        <Route path="/goals" element={<Goals />} />
+                        <Route path="/projects" element={<Projects />} />
+                        <Route path="/store" element={<Store />} />
+                        <Route path="/notifications" element={<Notifications />} />
                     </Route>
                 </Route>
                 <Route element={<MainLayout />}>
