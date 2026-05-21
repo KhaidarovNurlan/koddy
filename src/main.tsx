@@ -14,6 +14,7 @@ import { AIAssistant } from './pages/AIAssistant';
 import { NotFound } from './pages/NotFound';
 import { Login } from './pages/Login';
 import { Journeys } from './pages/Journeys';
+import { JourneyView } from './pages/JourneyView';
 import { Profile } from './pages/Profile';
 import { User } from './pages/User';
 import { Notifications } from './pages/Notifications';
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route element={<ProtectedRoute />}>
                     <Route element={<GameLayout />}>
                         <Route path="/journeys" element={<Journeys />} />
+                        <Route path="/journeys/:journeyId" element={<JourneyView />} />
                         <Route path="/challenges" element={<Challenges />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/leaderboard" element={<Leaderboard />} />

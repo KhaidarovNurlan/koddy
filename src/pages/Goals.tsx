@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import programmingQuotes from './quotes.json';
+import programmingQuotes from '../data/quotes.json';
 
 const GOALS = [
     { title: "Get 2 perfect completions", current: 0, total: 2 },

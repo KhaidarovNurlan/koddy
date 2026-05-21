@@ -63,7 +63,7 @@ function MyProfile() {
                                 <img src="/unknown_badge.svg" alt="Badge" className="w-16 h-16 opacity-50" />
                                 <div>
                                     <h4 className="font-bold text-white text-[15px]">Basic Profile</h4>
-                                    <p className="text-sm text-text-secondary">Added bio to profile</p>
+                                    <p className="text-sm text-text-secondary">Added title to profile</p>
                                 </div>
                             </div>
                         </div>

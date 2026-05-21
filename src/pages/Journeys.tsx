@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const LANGUAGES = [
@@ -30,8 +31,9 @@ export const Journeys = () => {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {LANGUAGES.map((lang) => (
-                    <div
+                    <Link
                         key={lang.id}
+                        to={`/journeys/${lang.id}`}
                         className='relative flex flex-col items-center justify-center p-6 md:p-8 rounded-2xl border-2 border-b-5 transition-all border-grey-light bg-grey-dark hover:border-b-2 hover:translate-y-[3px]'
                     >
 
@@ -49,7 +51,7 @@ export const Journeys = () => {
                         <p className="text-text-secondary text-xs md:text-sm mt-1.5 font-semibold text-center">
                             {lang.codders} Codders
                         </p>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </div>
