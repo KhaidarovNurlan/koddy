@@ -1,5 +1,25 @@
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+const JOURNEY_ICONS: Record<string, string> = {
+    'python': '/python.svg',
+    'javascript': '/js.svg',
+    'java': '/java.svg',
+    'cpp': '/cpp.svg',
+    'sqlite': '/sql.svg',
+    'c': '/c.svg',
+    'csharp': '/csharp.svg',
+    'lua': '/lua.svg',
+    'php': '/php.svg',
+    'go': '/go.svg',
+    'dart': '/dart.svg',
+    'rust': '/rust.svg',
+    'r': '/r.svg',
+    'ruby': '/ruby.svg',
+    'terminal': '/terminal.svg',
+    'swift': '/swift.svg',
+};
 
 const NAV_ITEMS = [
     { name: "Journey", icon: "/journey.svg", path: "/journeys" },
@@ -25,6 +45,11 @@ export const GameLayout = () => {
     const moreMenuRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
+
+    const { user, journeys, logout } = useAuth();
+    const navigate = useNavigate();
+    const activeJourney = journeys.length > 0 ? journeys[0] : null;
+    const activeJourneyIcon = activeJourney ? JOURNEY_ICONS[activeJourney] || '/no-journey.svg' : '/no-journey.svg';
 
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
@@ -62,27 +87,29 @@ export const GameLayout = () => {
         <div className="flex h-[100dvh] overflow-hidden">
             <aside className="hidden md:flex flex-col w-[260px] bg-grey-dark shrink-0 relative z-20 border-r-3 border-grey-light">
                 <div className="px-6 py-8">
-                    <Link to="/journeys">
-                        <img src="/logo-text.svg" alt="Koddy" className="h-8 object-contain" />
-                    </Link>
+                    <img src="/logo-text.svg" alt="Koddy" className="h-8 object-contain" />
                 </div>
 
                 <nav className="flex-1 px-4 pb-4 space-y-2">
-                    {NAV_ITEMS.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            className={({ isActive }) =>
-                                `flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors ${isActive
-                                    ? "font-semibold bg-grey-light"
-                                    : "hover:bg-grey-light/50"
-                                }`
-                            }
-                        >
-                            <img src={item.icon} alt={item.name} className="w-8 h-8 object-contain" />
-                            <span className="text-[18px]">{item.name}</span>
-                        </NavLink>
-                    ))}
+                    {NAV_ITEMS.map((item) => {
+                        const lastJourney = localStorage.getItem('lastJourneyId');
+                        const path = item.name === "Journey" && lastJourney ? `/journeys/${lastJourney}` : item.path;
+                        return (
+                            <NavLink
+                                key={item.path}
+                                to={path}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors ${isActive || (item.name === "Journey" && isJourneysPage)
+                                        ? "font-semibold bg-grey-light"
+                                        : "hover:bg-grey-light/50"
+                                    }`
+                                }
+                            >
+                                <img src={item.icon} alt={item.name} className="w-8 h-8 object-contain" />
+                                <span className="text-[18px]">{item.name}</span>
+                            </NavLink>
+                        )
+                    })}
 
                     <div className="relative group" ref={moreMenuRef}>
                         <button
@@ -105,7 +132,16 @@ export const GameLayout = () => {
                             </Link>
                             <div className="h-px bg-white/25 my-1 mx-3"></div>
                             <Link to="/notifications" className="block px-5 py-2 hover:bg-white/5">Notifications</Link>
-                            <button type="button" className="w-full text-left px-5 py-2 hover:bg-white/5">Logout</button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    logout();
+                                    navigate('/login');
+                                }}
+                                className="w-full text-left px-5 py-2 hover:bg-white/5 cursor-pointer"
+                            >
+                                Logout
+                            </button>
                         </div>
                     </div>
                 </nav>
@@ -141,7 +177,7 @@ export const GameLayout = () => {
                                     onClick={() => toggleMenu('journey')}
                                     className={`flex items-center justify-center p-2 rounded-xl transition-colors h-10 min-w-10 ${activeMenu === 'journey' ? 'bg-grey' : ''}`}
                                 >
-                                    <img src="/no-journey.svg" alt="Journey" className="w-6 h-6" />
+                                    <img src={activeJourneyIcon} alt="Journey" className="w-6 h-6" />
                                 </button>
 
                                 {activeMenu === 'journey' && (
@@ -150,6 +186,12 @@ export const GameLayout = () => {
                                             <div className="absolute -top-1.5 left-4 w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
                                             <div className="block px-5 py-3 font-semibold text-white">My Journeys</div>
                                             <div className="h-px bg-white/10 my-1 mx-3"></div>
+                                            {journeys.map(j => (
+                                                <Link key={j} to={`/journeys/${j}`} onClick={() => setActiveMenu(null)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
+                                                    <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
+                                                    <span className="capitalize">{j}</span>
+                                                </Link>
+                                            ))}
                                             <Link to="/journeys" onClick={() => setActiveMenu(null)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
                                                 <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center text-xl leading-none pt-0.5">+</div>
                                                 <span>Add Journey</span>
@@ -198,7 +240,7 @@ export const GameLayout = () => {
                                     onClick={() => toggleMenu('tokens')}
                                     className={`flex items-center justify-center gap-2 px-3 rounded-xl transition-colors h-10 ${activeMenu === 'tokens' ? 'bg-grey' : ''}`}
                                 >
-                                    <span className="text-orange">0</span>
+                                    <span className="text-orange">{user?.tokens || 0}</span>
                                     <img src="/token.svg" alt="Tokens" className="w-6 h-6" />
                                 </button>
 
@@ -209,7 +251,7 @@ export const GameLayout = () => {
                                             <img src="/tokens.svg" alt="Tokens" className="w-16 h-16 object-contain" />
                                             <div className="flex-1">
                                                 <h3 className="text-[16px] font-bold text-white mb-1">Tokens</h3>
-                                                <p className="text-text-secondary text-[16px] font-medium mb-2">You have <span className="font-bold text-white">0</span> tokens</p>
+                                                <p className="text-text-secondary text-[16px] font-medium mb-2">You have <span className="font-bold text-white">{user?.tokens || 0}</span> tokens</p>
                                                 <Link to="/store" onClick={() => setActiveMenu(null)} className="text-blue-light font-bold text-[12px] hover:text-white transition-colors uppercase tracking-wider">Go to store</Link>
                                             </div>
                                         </div>
@@ -223,7 +265,7 @@ export const GameLayout = () => {
                                     onClick={() => toggleMenu('energy')}
                                     className={`flex items-center justify-center gap-2 px-3 rounded-xl transition-colors h-10 ${activeMenu === 'energy' ? 'bg-grey' : ''}`}
                                 >
-                                    <span className="text-blue">5</span>
+                                    <span className="text-blue">{user?.energy ?? 5}</span>
                                     <img src="/energy.svg" alt="Energy" className="w-6 h-6" />
                                 </button>
 
@@ -234,10 +276,10 @@ export const GameLayout = () => {
                                             <h3 className="text-xl font-bold text-white mb-4">Energy</h3>
                                             <div className="flex gap-2 mb-4">
                                                 {MAX_ENERGY.map((i) => (
-                                                    <img key={i} src="/energy.svg" alt="Energy" className="w-6 h-6" />
+                                                    <img key={i} src="/energy.svg" alt="Energy" className={`w-6 h-6 ${(user?.energy ?? 5) > i ? '' : 'grayscale opacity-50'}`} />
                                                 ))}
                                             </div>
-                                            <p className="text-white font-bold text-[15px] mb-2">You have full energy</p>
+                                            <p className="text-white font-bold text-[15px] mb-2">{user?.energy === 5 ? 'You have full energy' : `You have ${user?.energy || 0} energy`}</p>
                                             <p className="text-text-secondary font-medium text-sm mb-6 text-center">Each energy equals one completed lesson</p>
 
                                             <button type="button" className="cursor-pointer w-full flex items-center justify-between bg-grey p-2.5 text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50]">
@@ -267,13 +309,19 @@ export const GameLayout = () => {
 
                             <div className="relative group pb-4 -mb-4">
                                 <div className="flex items-center justify-center p-2 rounded-xl group-hover:bg-grey transition-colors cursor-pointer h-10 min-w-10">
-                                    <img src="/no-journey.svg" alt="Journey" className="w-6 h-6" />
+                                    <img src={activeJourneyIcon} alt="Journey" className="w-6 h-6" />
                                 </div>
                                 <div className="absolute right-0 top-[calc(100%-8px)] w-48 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
                                     <div className="bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl py-2 relative">
                                         <div className="absolute -top-1.5 right-4 w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
                                         <div className="block px-5 py-3 font-semibold text-white">My Journeys</div>
                                         <div className="h-px bg-white/10 my-1 mx-3"></div>
+                                        {journeys.map(j => (
+                                            <Link key={j} to={`/journeys/${j}`} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
+                                                <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
+                                                <span className="capitalize">{j}</span>
+                                            </Link>
+                                        ))}
                                         <Link to="/journeys" className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
                                             <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center text-xl leading-none pt-0.5">+</div>
                                             <span>Add Journey</span>
@@ -310,7 +358,7 @@ export const GameLayout = () => {
 
                             <div className="relative group pb-4 -mb-4">
                                 <div className="flex items-center justify-center gap-2 px-3 rounded-xl group-hover:bg-grey transition-colors cursor-pointer h-10">
-                                    <span className="text-orange">0</span>
+                                    <span className="text-orange">{user?.tokens || 0}</span>
                                     <img src="/token.svg" alt="Tokens" className="w-6 h-6" />
                                 </div>
                                 <div className="absolute right-1/2 translate-x-[25px] top-[calc(100%-8px)] w-[280px] bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl p-5 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -319,7 +367,7 @@ export const GameLayout = () => {
                                         <img src="/tokens.svg" alt="Tokens" className="w-16 h-16 object-contain" />
                                         <div className="flex-1">
                                             <h3 className="text-xl font-bold text-white mb-2">Tokens</h3>
-                                            <p className="text-text-secondary text-[15px] font-medium mb-3">You have <span className="font-bold text-white">0</span> tokens</p>
+                                            <p className="text-text-secondary text-[15px] font-medium mb-3">You have <span className="font-bold text-white">{user?.tokens || 0}</span> tokens</p>
                                             <Link to="/store" className="text-blue-light font-bold text-[13px] hover:text-white transition-colors uppercase tracking-wider">Go to store</Link>
                                         </div>
                                     </div>
@@ -328,7 +376,7 @@ export const GameLayout = () => {
 
                             <div className="relative group pb-4 -mb-4">
                                 <div className="flex items-center justify-center gap-2 px-3 rounded-xl group-hover:bg-grey transition-colors cursor-pointer h-10">
-                                    <span className="text-blue">5</span>
+                                    <span className="text-blue">{user?.energy ?? 5}</span>
                                     <img src="/energy.svg" alt="Energy" className="w-6 h-6" />
                                 </div>
                                 <div className="absolute right-0 top-[calc(100%-8px)] w-[320px] bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl p-6 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -337,10 +385,10 @@ export const GameLayout = () => {
                                         <h3 className="text-xl font-bold text-white mb-4">Energy</h3>
                                         <div className="flex gap-2 mb-4">
                                             {MAX_ENERGY.map((i) => (
-                                                <img key={i} src="/energy.svg" alt="Energy" className="w-6 h-6" />
+                                                <img key={i} src="/energy.svg" alt="Energy" className={`w-6 h-6 ${(user?.energy ?? 5) > i ? '' : 'grayscale opacity-50'}`} />
                                             ))}
                                         </div>
-                                        <p className="text-white font-bold text-[15px] mb-2">You have full energy</p>
+                                        <p className="text-white font-bold text-[15px] mb-2">{user?.energy === 5 ? 'You have full energy' : `You have ${user?.energy || 0} energy`}</p>
                                         <p className="text-text-secondary font-medium text-sm mb-6 text-center">Each energy equals one completed lesson</p>
 
                                         <button type="button" className="cursor-pointer w-full flex items-center justify-between bg-grey p-2.5 text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
@@ -447,17 +495,21 @@ export const GameLayout = () => {
             </div>
 
             <nav className="md:hidden fixed bottom-0 left-0 w-full bg-grey-dark border-t-3 border-grey-light flex items-center justify-around gap-2 px-2 py-1 z-40">
-                {NAV_ITEMS.slice(0, 6).map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `flex flex-col items-center justify-center p-1 rounded-xl transition-all ${isActive ? "bg-white/10" : "opacity-60"}`
-                        }
-                    >
-                        <img src={item.icon} alt={item.name} className="w-10 h-10 object-contain" />
-                    </NavLink>
-                ))}
+                {NAV_ITEMS.slice(0, 6).map((item) => {
+                    const lastJourney = localStorage.getItem('lastJourneyId');
+                    const path = item.name === "Journey" && lastJourney ? `/journeys/${lastJourney}` : item.path;
+                    return (
+                        <NavLink
+                            key={item.path}
+                            to={path}
+                            className={({ isActive }) =>
+                                `flex flex-col items-center justify-center p-1 rounded-xl transition-all ${isActive || (item.name === "Journey" && isJourneysPage) ? "bg-white/10" : "opacity-60"}`
+                            }
+                        >
+                            <img src={item.icon} alt={item.name} className="w-10 h-10 object-contain" />
+                        </NavLink>
+                    )
+                })}
             </nav>
         </div>
     );

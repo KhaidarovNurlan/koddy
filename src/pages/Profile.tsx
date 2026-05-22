@@ -1,8 +1,11 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+import { useAuth } from '../context/AuthContext';
+
 function MyProfile() {
     const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
+    const { user } = useAuth();
 
     return (
         <>
@@ -28,7 +31,7 @@ function MyProfile() {
                     </div>
                 </div>
                 <div className="bg-grey-dark rounded-b-2xl pt-8 pb-6 px-8 mb-6">
-                    <h2 className="text-2xl font-bold text-white mb-6">Username</h2>
+                    <h2 className="text-2xl font-bold text-white mb-6">{user?.email ? user.email.split('@')[0] : 'Username'}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-grey border border-grey-light border-3 rounded-xl p-4 flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2">
@@ -40,7 +43,7 @@ function MyProfile() {
                         <div className="bg-grey border border-grey-light border-3 rounded-xl p-4 flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2">
                                 <img src="/xp-dark.svg" alt="Streak" className="w-8 h-8 mb-1" />
-                                <span className="font-bold text-md text-white">0</span>
+                                <span className="font-bold text-md text-white">{user?.xp || 0}</span>
                             </div>
                             <span className="text-md text-text-secondary font-medium">Total XP</span>
                         </div>

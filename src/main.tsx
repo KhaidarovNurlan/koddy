@@ -25,39 +25,45 @@ import { Projects } from './pages/Projects';
 import { Challenges } from './pages/Challenges';
 import { Store } from './pages/Store';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+
+import { Toaster } from 'react-hot-toast';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <ScrollToTop />
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route element={<ProtectedRoute />}>
-                    <Route element={<GameLayout />}>
-                        <Route path="/journeys" element={<Journeys />} />
-                        <Route path="/journeys/:journeyId" element={<JourneyView />} />
-                        <Route path="/challenges" element={<Challenges />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/leaderboard" element={<Leaderboard />} />
-                        <Route path="/goals" element={<Goals />} />
-                        <Route path="/projects" element={<Projects />} />
-                        <Route path="/store" element={<Store />} />
-                        <Route path="/notifications" element={<Notifications />} />
+            <AuthProvider>
+                <ScrollToTop />
+                <Toaster position="bottom-right" />
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route element={<GameLayout />}>
+                            <Route path="/journeys" element={<Journeys />} />
+                            <Route path="/journeys/:journeyId" element={<JourneyView />} />
+                            <Route path="/challenges" element={<Challenges />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/leaderboard" element={<Leaderboard />} />
+                            <Route path="/goals" element={<Goals />} />
+                            <Route path="/projects" element={<Projects />} />
+                            <Route path="/store" element={<Store />} />
+                            <Route path="/notifications" element={<Notifications />} />
+                        </Route>
+                        <Route path="/journeys/:journeyId/lessons/:lessonId" element={<LessonView />} />
                     </Route>
-                    <Route path="/journeys/:journeyId/lessons/:lessonId" element={<LessonView />} />
-                </Route>
-                <Route element={<MainLayout />}>
-                    <Route path="/" element={<Landing />} />
-                    <Route element={<CompanyLayout />}>
-                        <Route path="/about" element={<About />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/faqs" element={<FAQs />} />
-                        <Route path="/ai_assistant" element={<AIAssistant />} />
-                        <Route path="/user/:username" element={<User />} />
-                        <Route path="*" element={<NotFound />} />
+                    <Route element={<MainLayout />}>
+                        <Route path="/" element={<Landing />} />
+                        <Route element={<CompanyLayout />}>
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/faqs" element={<FAQs />} />
+                            <Route path="/ai_assistant" element={<AIAssistant />} />
+                            <Route path="/user/:username" element={<User />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Route>
                     </Route>
-                </Route>
-            </Routes>
+                </Routes>
+            </AuthProvider>
         </BrowserRouter>
     </StrictMode>
 );

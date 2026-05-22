@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { pythonJourney } from '../data/journeys';
+import { useAuth } from '../context/AuthContext';
 
-const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: number, tokens: number) => void; onSkip: () => void }) => {
-    const [state, setState] = useState<'intro' | 'playing' | 'completed'>('intro');
+const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: number, tokens: number, noMistakes: boolean) => void; onSkip: () => void }) => {
+    const [state, setState] = useState<'intro' | 'playing'>('intro');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
     
     const [failedQuestions, setFailedQuestions] = useState<any[]>([]);
     const [questionQueue, setQuestionQueue] = useState<any[]>([]);
+    const [mistakes, setMistakes] = useState(0);
     
     const handleStart = () => {
         setQuestionQueue([...quiz.questions]);
@@ -30,6 +32,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
         let newFailedQuestions = [...failedQuestions];
         
         if (!option.isCorrect) {
+            setMistakes(m => m + 1);
             if (!newFailedQuestions.find(q => q.id === currentQuestion.id)) {
                 newFailedQuestions.push(currentQuestion);
                 setFailedQuestions(newFailedQuestions);
@@ -48,8 +51,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                 setSelectedOptionIndex(null);
                 setIsSubmitted(false);
             } else {
-                setState('completed');
-                onComplete(quiz.xp, quiz.tokens);
+                onComplete(quiz.xp, quiz.tokens, mistakes === 0);
             }
         }
     };
@@ -92,21 +94,6 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     <a href="#" className="text-blue-light text-xs font-bold hover:underline">Always skip quizzes</a>
                     <div className="text-text-secondary text-[11px] mt-1">You can change this in settings</div>
                 </div>
-            </div>
-        );
-    }
-    
-    if (state === 'completed') {
-        return (
-            <div className="flex-1 flex flex-col items-center justify-center bg-grey-dark">
-                <h2 className="text-3xl font-bold text-green-500 mb-4">Quiz Completed!</h2>
-                <p className="text-text-secondary mb-8">You earned {quiz.xp} XP and {quiz.tokens} tokens.</p>
-                <button 
-                    onClick={onSkip}
-                    className="inline-flex items-center justify-center px-10 py-3.5 cursor-pointer bg-blue text-white font-bold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]"
-                >
-                    CONTINUE LEARNING
-                </button>
             </div>
         );
     }
@@ -284,14 +271,17 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
     );
 };
 
-const HintItem = ({ hint, index }: { hint: string; index: number }) => {
+const HintItem = ({ hint, index, onReveal }: { hint: string; index: number; onReveal: () => void }) => {
     const [isOpen, setIsOpen] = useState(false);
     
     return (
         <div className="border border-grey-lighter rounded-xl bg-[#1c1c1c] overflow-hidden mb-2">
             <div 
                 className="p-3 flex justify-between items-center cursor-pointer hover:bg-grey-dark transition-colors"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    if (!isOpen) onReveal();
+                    setIsOpen(!isOpen);
+                }}
             >
                 <div>
                     <div className="text-blue-light font-bold text-sm mb-0.5">Hint {index + 1}</div>
@@ -310,8 +300,96 @@ const HintItem = ({ hint, index }: { hint: string; index: number }) => {
     );
 };
 
+const LessonCompletedModal = ({ 
+    xp, 
+    tokens, 
+    energy = 1,
+    firstTry, 
+    noMistakes, 
+    isQuiz, 
+    onContinue 
+}: { 
+    xp: number, 
+    tokens: number, 
+    energy?: number,
+    firstTry?: boolean, 
+    noMistakes?: boolean, 
+    isQuiz?: boolean,
+    onContinue: () => void 
+}) => {
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+            <div className="bg-[#2B2D2E] rounded-3xl p-8 w-[400px] shadow-2xl flex flex-col items-center border border-grey-light relative animate-in fade-in zoom-in duration-300">
+                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                
+                <h2 className="text-2xl font-bold text-white mb-2">Lesson Completed!</h2>
+                
+                <div className="flex gap-4 w-full my-6">
+                    <div className="flex-1 bg-[#1c1c1c] border border-grey-light rounded-2xl p-4 flex flex-col items-center justify-center">
+                        <span className="text-blue-light font-bold text-2xl mb-1">+{xp}</span>
+                        <span className="text-text-secondary text-xs uppercase tracking-wider font-bold">XP</span>
+                    </div>
+                    <div className="flex-1 bg-[#1c1c1c] border border-grey-light rounded-2xl p-4 flex flex-col items-center justify-center">
+                        <span className="text-orange font-bold text-2xl mb-1">+{tokens}</span>
+                        <span className="text-text-secondary text-xs uppercase tracking-wider font-bold">Tokens</span>
+                    </div>
+                    <div className="flex-1 bg-[#1c1c1c] border border-grey-light rounded-2xl p-4 flex flex-col items-center justify-center">
+                        <span className="text-red-500 font-bold text-2xl mb-1">-{energy}</span>
+                        <span className="text-text-secondary text-xs uppercase tracking-wider font-bold">Energy</span>
+                    </div>
+                </div>
+
+                {isQuiz ? (
+                    noMistakes && (
+                        <div className="w-full bg-[#1c1c1c] border border-grey-light rounded-xl p-3 mb-6 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-yellow-500/20 p-2 rounded-lg">
+                                    <span className="text-xl">🏆</span>
+                                </div>
+                                <span className="font-bold text-white text-sm">No Mistakes Bonus!</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-orange font-bold text-sm">+5</span>
+                                <img src="/token.svg" className="w-4 h-4" alt="tokens" />
+                            </div>
+                        </div>
+                    )
+                ) : (
+                    firstTry && (
+                        <div className="w-full bg-[#1c1c1c] border border-grey-light rounded-xl p-3 mb-6 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-yellow-500/20 p-2 rounded-lg">
+                                    <span className="text-xl">🎯</span>
+                                </div>
+                                <span className="font-bold text-white text-sm">First Try Bonus!</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-orange font-bold text-sm">+5</span>
+                                <img src="/token.svg" className="w-4 h-4" alt="tokens" />
+                            </div>
+                        </div>
+                    )
+                )}
+
+                <button
+                    onClick={onContinue}
+                    className="w-full py-3.5 rounded-xl bg-blue border-b-4 border-blue-dark hover:brightness-110 active:border-b-2 active:translate-y-[2px] transition-all font-bold text-white uppercase tracking-wider"
+                >
+                    Continue
+                </button>
+            </div>
+        </div>
+    );
+};
+
 export const LessonView = () => {
     const { journeyId, lessonId } = useParams();
+    const navigate = useNavigate();
+    const { user, completeLesson, consumeEnergy } = useAuth();
 
     const journey = journeyId === 'python' ? pythonJourney : null;
 
@@ -337,6 +415,11 @@ export const LessonView = () => {
     const [activeTab, setActiveTab] = useState<'lesson' | 'submissions' | 'support' | 'feedback'>('lesson');
 
     const [code, setCode] = useState(lesson?.codingChallenge?.starterCode || '');
+    const [output, setOutput] = useState<string>('');
+    const [hintsUsed, setHintsUsed] = useState(false);
+    
+    const [showCompletionModal, setShowCompletionModal] = useState(false);
+    const [completedData, setCompletedData] = useState<{xp: number, tokens: number, energy?: number, firstTry?: boolean, noMistakes?: boolean, isQuiz?: boolean} | null>(null);
 
     useEffect(() => {
         if (lesson?.codingChallenge) {
@@ -344,7 +427,11 @@ export const LessonView = () => {
             setIsSolutionOpen(false);
             setIsTheoryHidden(false);
         }
-    }, [lesson]);
+        
+        if (user && user.energy <= 0) {
+            navigate(`/journeys/${journeyId}`);
+        }
+    }, [lesson, user?.energy, navigate, journeyId]);
 
     if (!lesson) {
         return <div className="p-10 text-center text-white">Lesson not found</div>;
@@ -352,6 +439,7 @@ export const LessonView = () => {
 
     const handleReveal = () => {
         setIsSolutionOpen(true);
+        setHintsUsed(true);
         setShowSolutionModal(false);
     };
 
@@ -370,8 +458,54 @@ export const LessonView = () => {
     const numLines = code.split('\n').length;
     const linesArray = Array.from({ length: Math.max(1, numLines) }, (_, i) => i + 1);
 
+    const finishLesson = async () => {
+        if (!completedData || !lesson || !chapter) return;
+        await completeLesson({
+            journeyId,
+            chapterId: chapter.id,
+            lessonId: lesson.id,
+            xp: completedData.xp,
+            tokens: completedData.tokens
+        });
+        await consumeEnergy();
+        navigate(`/journeys/${journeyId}`);
+    };
+
+    const handleRunCode = () => {
+        if (!lesson?.codingChallenge) return;
+        
+        const reqOutput = lesson.codingChallenge.requiredOutput;
+        const hasCorrectOutput = code.includes(reqOutput);
+        
+        if (hasCorrectOutput) {
+            setOutput(reqOutput);
+            
+            const firstTry = !hintsUsed;
+            const challengeXp = lesson.codingChallenge.xp + (firstTry ? 10 : 0);
+            const challengeTokens = isSolutionOpen ? 0 : (lesson.codingChallenge.tokens + (firstTry ? 5 : 0));
+            
+            setCompletedData({
+                xp: challengeXp,
+                tokens: challengeTokens,
+                energy: 1,
+                firstTry,
+                isQuiz: false
+            });
+            setShowCompletionModal(true);
+        } else {
+            setOutput('Error: Output does not match expected result or syntax error occurred.');
+        }
+    };
+
     return (
         <div className="flex h-screen w-full bg-grey-dark text-white overflow-hidden relative">
+            {showCompletionModal && completedData && (
+                <LessonCompletedModal 
+                    {...completedData} 
+                    onContinue={finishLesson} 
+                />
+            )}
+
             {showSolutionModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="bg-[#2B2D2E] rounded-2xl p-6 w-[400px] shadow-2xl flex flex-col items-center border border-grey-light">
@@ -568,7 +702,7 @@ export const LessonView = () => {
                                         </h3>
                                         <div className="flex flex-col">
                                             {lesson.codingChallenge.hints.map((hint, idx) => (
-                                                <HintItem key={idx} index={idx} hint={hint} />
+                                                <HintItem key={idx} index={idx} hint={hint} onReveal={() => setHintsUsed(true)} />
                                             ))}
                                         </div>
                                     </div>
@@ -708,13 +842,40 @@ export const LessonView = () => {
                         <img src="/token.svg" className="w-4 h-4" alt="tokens" />
                     </div>
                     <div className="flex items-center">
-                        <span className="text-white mr-1.5">{activeTab === 'lesson' ? 5 : 5}</span>
+                        <span className="text-white mr-1.5">{user?.energy ?? 5}</span>
                         <img src="/energy.svg" className="w-4 h-4" alt="energy" />
                     </div>
                     <img src="/avatar_placeholder.png" className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
                 </div>
 
-                {lesson.codingChallenge ? (
+                {lesson.quiz ? (
+                    <QuizView 
+                        quiz={lesson.quiz} 
+                        onComplete={(xp, tokens, noMistakes) => {
+                            const xpEarned = xp + (noMistakes ? 10 : 0);
+                            const tokensEarned = tokens + (noMistakes ? 5 : 0);
+                            
+                            setCompletedData({
+                                xp: xpEarned,
+                                tokens: tokensEarned,
+                                energy: 1,
+                                noMistakes,
+                                isQuiz: true
+                            });
+                            setShowCompletionModal(true);
+                        }} 
+                        onSkip={() => {
+                            setCompletedData({
+                                xp: 0,
+                                tokens: 0,
+                                energy: 1,
+                                noMistakes: false,
+                                isQuiz: true
+                            });
+                            setShowCompletionModal(true);
+                        }}
+                    />
+                ) : lesson.codingChallenge ? (
                     <div className="flex-1 flex flex-col">
                         <div className="h-[40px] bg-grey-dark border-b border-grey-lighter flex justify-between items-center px-4 shrink-0 select-none">
                             <div className="bg-[#1c1c1c] text-xs text-white/90 px-4 py-2 border-t-2 border-blue-light font-semibold rounded-t-lg mt-[6px]">
@@ -753,7 +914,7 @@ export const LessonView = () => {
                                     spellCheck={false}
                                 />
                             </div>
-
+ 
                             <div className="absolute bottom-4 right-4 flex gap-3 z-10">
                                 <button className="bg-grey-lighter text-white/80 px-4 py-2 rounded-lg flex items-center text-sm font-semibold border border-grey-light hover:brightness-110 transition-all">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -761,7 +922,7 @@ export const LessonView = () => {
                                     </svg>
                                     Ask AI
                                 </button>
-                                <button className="bg-blue text-white px-5 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all shadow-[0_0_15px_rgba(27,120,160,0.5)]">
+                                <button onClick={handleRunCode} className="bg-blue text-white px-5 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all shadow-[0_0_15px_rgba(27,120,160,0.5)]">
                                     <img src="/play-white.svg" className="w-4 h-4 mr-2" alt="run" />
                                     Run Code
                                 </button>
@@ -775,6 +936,9 @@ export const LessonView = () => {
                             <div className="flex-1 flex p-5 text-sm font-mono">
                                 <div className="flex-1 border-r border-grey-lighter pr-6">
                                     <div className="text-text-secondary text-xs mb-3 font-sans uppercase tracking-wider">Output</div>
+                                    <div className={`text-white/90 p-3 rounded-lg border font-mono whitespace-pre-wrap min-h-[40px] ${output.includes('Error') ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-grey border-grey-light text-white/90'}`}>
+                                        {output}
+                                    </div>
                                 </div>
                                 <div className="flex-1 pl-6">
                                     <div className="flex justify-between items-center text-text-secondary text-xs mb-3 font-sans">
@@ -787,18 +951,6 @@ export const LessonView = () => {
                             </div>
                         </div>
                     </div>
-                ) : lesson.quiz ? (
-                    <QuizView 
-                        quiz={lesson.quiz} 
-                        onComplete={(xp, tokens) => {
-                            // Example logic for completing quiz
-                            console.log(`Earned ${xp} XP and ${tokens} tokens!`);
-                        }} 
-                        onSkip={() => {
-                            // Example logic for skipping quiz
-                            window.location.href = `/journeys/${journeyId}`;
-                        }}
-                    />
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-text-secondary bg-grey-dark">
                         No content for this lesson yet.

@@ -63,48 +63,6 @@ export const pythonJourney: Journey = {
           title: 'Your First Program',
           description: 'Write your first Python script.',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -129,48 +87,6 @@ export const pythonJourney: Journey = {
           title: 'Mastery Challenge',
           description: 'Prove your knowledge with Mastery!',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -202,48 +118,6 @@ export const pythonJourney: Journey = {
           title: 'What are Functions?',
           description: 'Learn how to encapsulate logic.',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -262,48 +136,6 @@ export const pythonJourney: Journey = {
           title: 'Arguments & Returns',
           description: 'Pass data in and get data out.',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -322,48 +154,6 @@ export const pythonJourney: Journey = {
           title: 'Scope',
           description: 'Understand local and global variables.',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -388,48 +178,6 @@ export const pythonJourney: Journey = {
           title: 'Functions Challenge',
           description: 'Test your understanding of functions.',
           type: 'lesson-challenge',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -448,48 +196,6 @@ export const pythonJourney: Journey = {
           title: 'Calculator Project',
           description: 'Apply your knowledge in a mini-project.',
           type: 'lesson-project',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -521,48 +227,6 @@ export const pythonJourney: Journey = {
           title: 'Classes & Objects',
           description: 'The foundation of OOP.',
           type: 'lesson-challenge',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -581,48 +245,6 @@ export const pythonJourney: Journey = {
           title: 'Methods & Properties',
           description: 'Adding behavior to objects.',
           type: 'lesson-project',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -641,48 +263,6 @@ export const pythonJourney: Journey = {
           title: 'Inheritance',
           description: 'Reuse and extend classes.',
           type: 'lesson-project',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -707,48 +287,6 @@ export const pythonJourney: Journey = {
           title: 'RPG Game Project',
           description: 'Build a small text-based RPG.',
           type: 'lesson-project',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
@@ -767,48 +305,6 @@ export const pythonJourney: Journey = {
           title: 'OOP Challenge',
           description: 'Test your understanding of OOP.',
           type: 'lesson-all',
-          quiz: {
-            title: 'Quiz Time',
-            description: 'Test what you just learned.',
-            xp: 15,
-            tokens: 5,
-            energy: 1,
-            questions: [
-              {
-                id: 'q1',
-                type: 'mark-lines',
-                question: 'Find the line that will NOT execute:',
-                options: [
-                  { text: 'print("Line one")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' },
-                  { text: '# print("Line two")', isCorrect: true, explanation: 'Comments start with # and are ignored by Python.' },
-                  { text: 'print("Line three")', isCorrect: false, explanation: 'This is a valid print statement and will execute.' }
-                ]
-              },
-              {
-                id: 'q2',
-                type: 'multiple-choice',
-                question: 'What does this code output?',
-                codeSnippet: 'print("Hello World!")',
-                options: [
-                  { text: 'print("Hello World!")', isCorrect: false, explanation: 'The print function evaluates the contents, it does not output the function call itself.' },
-                  { text: 'Nothing appears', isCorrect: false, explanation: 'The print function will display the text provided.' },
-                  { text: '"Hello World!"', isCorrect: false, explanation: 'Text strings in print() must be enclosed in quotation marks, but the quotation marks themselves are not printed.' },
-                  { text: 'Hello World!', isCorrect: true, explanation: 'The print() function displays the text inside the quotation marks exactly as written.' }
-                ]
-              },
-              {
-                id: 'q3',
-                type: 'fill-in-blank',
-                question: 'Display "Welcome" on the screen',
-                codeSnippet: '___("Welcome")',
-                options: [
-                  { text: 'show', isCorrect: false, explanation: 'There is no built-in "show" function in Python.' },
-                  { text: 'display', isCorrect: false, explanation: 'There is no built-in "display" function in Python.' },
-                  { text: 'print', isCorrect: true, explanation: 'The print() function is the correct way to output text to the screen.' }
-                ]
-              }
-            ],
-          },
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
