@@ -15,6 +15,7 @@ import { NotFound } from './pages/NotFound';
 import { Login } from './pages/Login';
 import { Journeys } from './pages/Journeys';
 import { JourneyView } from './pages/JourneyView';
+import { LessonView } from './pages/LessonView';
 import { Profile } from './pages/Profile';
 import { User } from './pages/User';
 import { Notifications } from './pages/Notifications';
@@ -43,6 +44,7 @@ createRoot(document.getElementById('root')!).render(
                         <Route path="/store" element={<Store />} />
                         <Route path="/notifications" element={<Notifications />} />
                     </Route>
+                    <Route path="/journeys/:journeyId/lessons/:lessonId" element={<LessonView />} />
                 </Route>
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<Landing />} />

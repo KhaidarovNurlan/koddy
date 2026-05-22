@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g class="layer">
+  <title>Layer 1</title>
+  <path d="m31.16,88.88l13,-17.51c1.02,-1.37 2.92,-0.52 2.92,1.3l0,13.56c0,1.1 0.75,1.98 1.67,1.98l6.32,0c1.43,0 2.2,2.01 1.25,3.29l-12.99,17.51c-1.02,1.37 -2.93,0.52 -2.93,-1.3l0,-13.56c0,-1.1 -0.74,-1.98 -1.66,-1.98l-6.33,0c-1.43,0 -2.2,-2.01 -1.25,-3.29z" fill="#7c79c8" id="svg_2" stroke="#7c79c8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" transform="matrix(2.20452 0 0 2.20452 -36.4296 -138.835)"/>
+ </g>
+</svg>
