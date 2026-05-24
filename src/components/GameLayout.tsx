@@ -40,15 +40,93 @@ const DAILY_GOALS_MOCK = [
     { title: "Earn 70 XP", current: 0, total: 70 },
 ];
 
+const EnergyMenuContent = ({ user, refreshUser }: { user: any; refreshUser: () => Promise<void> }) => {
+    const [timeLeftStr, setTimeLeftStr] = useState('');
+
+    useEffect(() => {
+        if (!user || user.energy >= 5) {
+            setTimeLeftStr('');
+            return;
+        }
+
+        const updateTimer = () => {
+            const lastUpdate = new Date(user.lastEnergyUpdate).getTime();
+            const nextUpdate = lastUpdate + 2 * 60 * 1000; // 2 minutes in ms
+            const now = Date.now();
+            const diff = nextUpdate - now;
+
+            if (diff <= 0) {
+                setTimeLeftStr('Regenerating...');
+                refreshUser();
+            } else {
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+                setTimeLeftStr(`${minutes}:${formattedSeconds}`);
+            }
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [user, refreshUser]);
+
+    return (
+        <div className="flex flex-col items-center">
+            <h3 className="text-xl font-bold text-white mb-4">Energy</h3>
+            <div className="flex gap-2 mb-4">
+                {MAX_ENERGY.map((i) => (
+                    <img key={i} src="/energy.svg" alt="Energy" className={`w-6 h-6 ${(user?.energy ?? 5) > i ? '' : 'grayscale opacity-50'}`} />
+                ))}
+            </div>
+            <p className="text-white font-bold text-[15px] mb-2">
+                {user?.energy === 5 ? 'You have full energy' : `You have ${user?.energy || 0} energy`}
+            </p>
+            {user && user.energy < 5 && timeLeftStr && (
+                <div className="text-orange font-semibold text-xs mb-4 flex items-center gap-1.5 bg-orange/10 px-3 py-1.5 rounded-full border border-orange/20 animate-pulse">
+                    <span>⚡ +1 Energy in:</span>
+                    <span className="font-mono font-bold text-sm text-white">{timeLeftStr}</span>
+                </div>
+            )}
+            <p className="text-text-secondary font-medium text-sm mb-6 text-center">
+                Each energy equals one completed lesson
+            </p>
+
+            <button type="button" className="cursor-pointer w-full flex items-center justify-between bg-grey p-2.5 text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
+                <div className="flex items-center gap-3">
+                    <img src="/energy-refill.svg" className="w-6 h-6" alt="" />
+                    <span>REFILL ENERGY</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-white/50">
+                    <span>25</span>
+                    <img src="/token.svg" alt="Token" className="w-3.5 h-3.5 grayscale" />
+                </div>
+            </button>
+        </div>
+    );
+};
+
 export const GameLayout = () => {
     const currentDayIndex = useMemo(() => new Date().getDay(), []);
     const moreMenuRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
 
-    const { user, journeys, logout } = useAuth();
+    const { user, journeys, logout, refreshUser } = useAuth();
     const navigate = useNavigate();
-    const activeJourney = journeys.length > 0 ? journeys[0] : null;
+
+    const activeJourney = useMemo(() => {
+        const match = location.pathname.match(/^\/journeys\/([^/]+)/);
+        if (match && match[1]) {
+            return match[1];
+        }
+        const lastJourneyId = localStorage.getItem('lastJourneyId');
+        if (lastJourneyId) {
+            return lastJourneyId;
+        }
+        return journeys.length > 0 ? journeys[0] : null;
+    }, [location.pathname, journeys]);
+
     const activeJourneyIcon = activeJourney ? JOURNEY_ICONS[activeJourney] || '/no-journey.svg' : '/no-journey.svg';
 
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -92,8 +170,7 @@ export const GameLayout = () => {
 
                 <nav className="flex-1 px-4 pb-4 space-y-2">
                     {NAV_ITEMS.map((item) => {
-                        const lastJourney = localStorage.getItem('lastJourneyId');
-                        const path = item.name === "Journey" && lastJourney ? `/journeys/${lastJourney}` : item.path;
+                        const path = item.name === "Journey" && activeJourney ? `/journeys/${activeJourney}` : item.path;
                         return (
                             <NavLink
                                 key={item.path}
@@ -186,12 +263,27 @@ export const GameLayout = () => {
                                             <div className="absolute -top-1.5 left-4 w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
                                             <div className="block px-5 py-3 font-semibold text-white">My Journeys</div>
                                             <div className="h-px bg-white/10 my-1 mx-3"></div>
-                                            {journeys.map(j => (
-                                                <Link key={j} to={`/journeys/${j}`} onClick={() => setActiveMenu(null)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
-                                                    <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
-                                                    <span className="capitalize">{j}</span>
-                                                </Link>
-                                            ))}
+                                            {journeys.map(j => {
+                                                const isActive = j === activeJourney;
+                                                return (
+                                                    <Link
+                                                        key={j}
+                                                        to={`/journeys/${j}`}
+                                                        onClick={() => setActiveMenu(null)}
+                                                        className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${
+                                                            isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
+                                                            <span className="capitalize">{j}</span>
+                                                        </div>
+                                                        {isActive && (
+                                                            <span className="w-2 h-2 rounded-full bg-blue-light"></span>
+                                                        )}
+                                                    </Link>
+                                                );
+                                            })}
                                             <Link to="/journeys" onClick={() => setActiveMenu(null)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
                                                 <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center text-xl leading-none pt-0.5">+</div>
                                                 <span>Add Journey</span>
@@ -272,27 +364,7 @@ export const GameLayout = () => {
                                 {activeMenu === 'energy' && (
                                     <div className="absolute right-0 top-[calc(100%+8px)] w-[320px] bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl p-6 z-50 transition-all duration-200">
                                         <div className="absolute -top-2 right-[25px] w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
-                                        <div className="flex flex-col items-center">
-                                            <h3 className="text-xl font-bold text-white mb-4">Energy</h3>
-                                            <div className="flex gap-2 mb-4">
-                                                {MAX_ENERGY.map((i) => (
-                                                    <img key={i} src="/energy.svg" alt="Energy" className={`w-6 h-6 ${(user?.energy ?? 5) > i ? '' : 'grayscale opacity-50'}`} />
-                                                ))}
-                                            </div>
-                                            <p className="text-white font-bold text-[15px] mb-2">{user?.energy === 5 ? 'You have full energy' : `You have ${user?.energy || 0} energy`}</p>
-                                            <p className="text-text-secondary font-medium text-sm mb-6 text-center">Each energy equals one completed lesson</p>
-
-                                            <button type="button" className="cursor-pointer w-full flex items-center justify-between bg-grey p-2.5 text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50]">
-                                                <div className="flex items-center gap-3">
-                                                    <img src="/energy-refill.svg" className="w-6 h-6" alt="" />
-                                                    <span>REFILL ENERGY</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5 text-white/50">
-                                                    <span>25</span>
-                                                    <img src="/token.svg" alt="Token" className="w-3.5 h-3.5 grayscale" />
-                                                </div>
-                                            </button>
-                                        </div>
+                                        <EnergyMenuContent user={user} refreshUser={refreshUser} />
                                     </div>
                                 )}
                             </div>
@@ -316,12 +388,26 @@ export const GameLayout = () => {
                                         <div className="absolute -top-1.5 right-4 w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
                                         <div className="block px-5 py-3 font-semibold text-white">My Journeys</div>
                                         <div className="h-px bg-white/10 my-1 mx-3"></div>
-                                        {journeys.map(j => (
-                                            <Link key={j} to={`/journeys/${j}`} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
-                                                <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
-                                                <span className="capitalize">{j}</span>
-                                            </Link>
-                                        ))}
+                                        {journeys.map(j => {
+                                            const isActive = j === activeJourney;
+                                            return (
+                                                <Link
+                                                    key={j}
+                                                    to={`/journeys/${j}`}
+                                                    className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${
+                                                        isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
+                                                        <span className="capitalize">{j}</span>
+                                                    </div>
+                                                    {isActive && (
+                                                        <span className="w-2 h-2 rounded-full bg-blue-light"></span>
+                                                    )}
+                                                </Link>
+                                            );
+                                        })}
                                         <Link to="/journeys" className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors font-semibold text-text-secondary hover:text-white">
                                             <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center text-xl leading-none pt-0.5">+</div>
                                             <span>Add Journey</span>
@@ -381,27 +467,7 @@ export const GameLayout = () => {
                                 </div>
                                 <div className="absolute right-0 top-[calc(100%-8px)] w-[320px] bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl p-6 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
                                     <div className="absolute -top-2 right-[25px] w-3 h-3 bg-grey-dark border-t-2 border-l-2 border-grey-light rotate-45"></div>
-                                    <div className="flex flex-col items-center">
-                                        <h3 className="text-xl font-bold text-white mb-4">Energy</h3>
-                                        <div className="flex gap-2 mb-4">
-                                            {MAX_ENERGY.map((i) => (
-                                                <img key={i} src="/energy.svg" alt="Energy" className={`w-6 h-6 ${(user?.energy ?? 5) > i ? '' : 'grayscale opacity-50'}`} />
-                                            ))}
-                                        </div>
-                                        <p className="text-white font-bold text-[15px] mb-2">{user?.energy === 5 ? 'You have full energy' : `You have ${user?.energy || 0} energy`}</p>
-                                        <p className="text-text-secondary font-medium text-sm mb-6 text-center">Each energy equals one completed lesson</p>
-
-                                        <button type="button" className="cursor-pointer w-full flex items-center justify-between bg-grey p-2.5 text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
-                                            <div className="flex items-center gap-3">
-                                                <img src="/energy-refill.svg" className="w-6 h-6" alt="" />
-                                                <span>REFILL ENERGY</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-white/50">
-                                                <span>25</span>
-                                                <img src="/token.svg" alt="Token" className="w-3.5 h-3.5 grayscale" />
-                                            </div>
-                                        </button>
-                                    </div>
+                                    <EnergyMenuContent user={user} refreshUser={refreshUser} />
                                 </div>
                             </div>
                         </div>
@@ -496,8 +562,7 @@ export const GameLayout = () => {
 
             <nav className="md:hidden fixed bottom-0 left-0 w-full bg-grey-dark border-t-3 border-grey-light flex items-center justify-around gap-2 px-2 py-1 z-40">
                 {NAV_ITEMS.slice(0, 6).map((item) => {
-                    const lastJourney = localStorage.getItem('lastJourneyId');
-                    const path = item.name === "Journey" && lastJourney ? `/journeys/${lastJourney}` : item.path;
+                    const path = item.name === "Journey" && activeJourney ? `/journeys/${activeJourney}` : item.path;
                     return (
                         <NavLink
                             key={item.path}

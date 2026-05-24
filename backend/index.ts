@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = new Hono();
 
-app.use('*', logger())
+app.use('*', logger());
 
 app.use('/*', cors());
 
@@ -83,7 +83,7 @@ api.get('/journeys/stats', async (c) => {
       journeyId: userJourneys.journeyId,
       count: sql<number>`count(${userJourneys.id})`.mapWith(Number)
     }).from(userJourneys).groupBy(userJourneys.journeyId);
-    
+
     return c.json({ stats });
   } catch (error) {
     console.error('Stats error:', error);
@@ -123,8 +123,7 @@ api.get('/user/me', async (c) => {
     const journeys = Array.from(new Set(userJourneyRecords.map(j => j.journeyId)));
 
     const lessonRecords = await db.select().from(userLessons).where(eq(userLessons.userId, user.id));
-    
-    // Omit passwordHash
+
     const { passwordHash, ...safeUser } = user;
     safeUser.energy = energy;
     safeUser.lastEnergyUpdate = lastEnergyUpdate;
@@ -140,15 +139,15 @@ api.post('/user/journeys', async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const { journeyId } = await c.req.json();
-    
+
     if (!journeyId) return c.json({ error: 'journeyId is required' }, 400);
 
     const existing = await db.select().from(userJourneys).where(sql`${userJourneys.userId} = ${payload.id} AND ${userJourneys.journeyId} = ${journeyId}`).limit(1);
-    
+
     if (existing.length === 0) {
       await db.insert(userJourneys).values({ userId: payload.id, journeyId });
     }
-    
+
     return c.json({ success: true });
   } catch (error) {
     console.error('Add journey error:', error);
@@ -160,7 +159,7 @@ api.post('/user/lessons/submit', async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const { journeyId, lessonId, taskId, code, passed } = await c.req.json();
-    
+
     const [submission] = await db.insert(lessonSubmissions).values({
       userId: payload.id,
       journeyId,
@@ -169,7 +168,7 @@ api.post('/user/lessons/submit', async (c) => {
       code,
       passed
     }).returning();
-    
+
     return c.json({ submission });
   } catch (error) {
     console.error('Submit task error:', error);
@@ -181,19 +180,19 @@ api.post('/user/lessons/complete', async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const { journeyId, chapterId, lessonId, tokens, xp, consumedEnergy } = await c.req.json();
-    
+
     const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
     if (!user) return c.json({ error: 'User not found' }, 404);
 
     let { energy, lastEnergyUpdate } = await updateEnergy(user);
 
     if (consumedEnergy && energy > 0) {
-        energy -= 1;
-        if (energy === 4) { // It just dropped from 5, start the timer
-            lastEnergyUpdate = new Date();
-        }
+      energy -= 1;
+      if (energy === 4) {
+        lastEnergyUpdate = new Date();
+      }
     } else if (consumedEnergy && energy <= 0) {
-        return c.json({ error: 'Not enough energy' }, 400);
+      return c.json({ error: 'Not enough energy' }, 400);
     }
 
     const newXp = user.xp + (xp || 0);
@@ -202,7 +201,7 @@ api.post('/user/lessons/complete', async (c) => {
     await db.update(users).set({ xp: newXp, tokens: newTokens, energy, lastEnergyUpdate }).where(eq(users.id, user.id));
 
     const existingLesson = await db.select().from(userLessons).where(sql`${userLessons.userId} = ${payload.id} AND ${userLessons.journeyId} = ${journeyId} AND ${userLessons.lessonId} = ${lessonId} AND ${userLessons.chapterId} = ${chapterId}`).limit(1);
-    
+
     if (existingLesson.length === 0) {
       await db.insert(userLessons).values({
         userId: payload.id,
@@ -222,28 +221,136 @@ api.post('/user/lessons/complete', async (c) => {
 });
 
 api.post('/user/energy/consume', async (c) => {
-    try {
-        const payload = c.get('jwtPayload') as any;
-        const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
-        if (!user) return c.json({ error: 'User not found' }, 404);
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
+    if (!user) return c.json({ error: 'User not found' }, 404);
 
-        let { energy, lastEnergyUpdate } = await updateEnergy(user);
-        
-        if (energy <= 0) {
-            return c.json({ error: 'Not enough energy' }, 400);
-        }
+    let { energy, lastEnergyUpdate } = await updateEnergy(user);
 
-        energy -= 1;
-        if (energy === 4) {
-            lastEnergyUpdate = new Date();
-        }
+    const body = await c.req.json().catch(() => ({}));
+    const amount = typeof body.amount === 'number' ? body.amount : 1;
 
-        await db.update(users).set({ energy, lastEnergyUpdate }).where(eq(users.id, user.id));
-        return c.json({ success: true, energy });
-    } catch (error) {
-        console.error('Consume energy error:', error);
-        return c.json({ error: 'Internal server error' }, 500);
+    if (amount <= 0) {
+      return c.json({ success: true, energy });
     }
+
+    if (energy < amount) {
+      return c.json({ error: 'Not enough energy' }, 400);
+    }
+
+    const prevEnergy = energy;
+    energy -= amount;
+    if (energy < 5 && prevEnergy >= 5) {
+      lastEnergyUpdate = new Date();
+    }
+
+    await db.update(users).set({ energy, lastEnergyUpdate }).where(eq(users.id, user.id));
+    return c.json({ success: true, energy });
+  } catch (error) {
+    console.error('Consume energy error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+async function runCode(language: string, code: string, apiKey: string, apiHost: string, apiUrl: string) {
+  const lang = language.toLowerCase();
+
+  const getMainFileName = (l: string) => {
+    switch (l) {
+      case 'python': return 'main.py';
+      case 'javascript': return 'main.js';
+      case 'java': return 'Main.java';
+      case 'cpp': return 'main.cpp';
+      case 'c': return 'main.c';
+      case 'csharp': return 'main.cs';
+      case 'lua': return 'main.lua';
+      case 'php': return 'main.php';
+      case 'go': return 'main.go';
+      case 'dart': return 'main.dart';
+      case 'rust': return 'main.rs';
+      case 'r': return 'main.r';
+      case 'ruby': return 'main.rb';
+      case 'swift': return 'main.swift';
+      default: return 'main.txt';
+    }
+  };
+
+  const requestBody = {
+    language: lang,
+    stdin: "",
+    files: [
+      {
+        name: getMainFileName(lang),
+        content: code
+      }
+    ]
+  };
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-rapidapi-key': apiKey,
+      'x-rapidapi-host': apiHost
+    },
+    body: JSON.stringify(requestBody)
+  });
+
+  if (!response.ok) {
+    throw new Error(`RapidAPI responded with status: ${response.status}`);
+  }
+
+  const body = await response.json() as any;
+  const stdout = body.stdout || '';
+  const stderr = body.stderr || '';
+
+  return { stdout, stderr };
+}
+
+api.post('/user/code/run', async (c) => {
+  try {
+    const { language, code } = await c.req.json();
+    if (!language || !code) {
+      return c.json({ error: 'Language and code are required' }, 400);
+    }
+
+    const apiKey = process.env.RAPIDAPI_KEY ?? "";
+    const apiHost = process.env.RAPIDAPI_HOST ?? "";
+    const apiUrl = process.env.RAPIDAPI_URL ?? "";
+
+    let result: { stdout: string; stderr: string };
+
+    console.log("DEBUG: Target URL is ->", apiUrl);
+
+    try {
+      result = await runCode(language, code, apiKey, apiHost, apiUrl);
+      return c.json(result);
+    } catch (err: any) {
+      console.error('RapidAPI run failed, trying local fallback:', err);
+    }
+
+  } catch (error: any) {
+    console.error('Run code error:', error);
+    return c.json({ error: 'Internal server error', details: error.message }, 500);
+  }
+});
+
+api.get('/user/lessons/submissions/:lessonId', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const lessonId = c.req.param('lessonId');
+
+    const submissions = await db.select()
+      .from(lessonSubmissions)
+      .where(sql`${lessonSubmissions.userId} = ${payload.id} AND ${lessonSubmissions.lessonId} = ${lessonId}`)
+      .orderBy(sql`${lessonSubmissions.submittedAt} DESC`);
+
+    return c.json({ submissions });
+  } catch (error) {
+    console.error('Fetch submissions error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
 });
 
 const port = 3000;

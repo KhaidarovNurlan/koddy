@@ -1,26 +1,26 @@
 import type { Journey } from './types';
 
-export const pythonJourney: Journey = {
-  id: 'python-journey',
-  language: 'python',
-  title: 'Python Journey',
+export const dartJourney: Journey = {
+  id: 'dart-journey',
+  language: 'dart',
+  title: 'Dart Journey',
   chapters: [
     {
       id: 'ch1',
       title: 'Introduction',
-      description: 'Get started with Python',
+      description: 'Get started with Dart',
       lessons: [
         {
-          id: 'py-ch1-l1',
+          id: 'dart-ch1-l1',
           title: 'Your First Program',
           description: 'Write your first Python script.',
           type: 'lesson-all',
           codingChallenge: {
             title: 'Challenge',
             description: 'Complete the coding challenge below.',
-            solution: 'print("Hello World")',
+            solution: "print(\"Hello World\")",
             hints: ['Think about the syntax.', 'Check for typos.'],
-            starterCode: '# Write your code here',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write a program that outputs exactly what is requested.',
             requiredOutput: 'Hello World',
             xp: 10,
@@ -29,9 +29,9 @@ export const pythonJourney: Journey = {
           },
         },
         {
-          id: 'py-ch1-l2',
+          id: 'dart-ch1-l2',
           title: 'The Language',
-          description: 'Learn the basics of Python programming.',
+          description: 'Learn the basics of Dart programming.',
           type: 'lesson-theory',
           quiz: {
             title: 'Quiz Time',
@@ -77,19 +77,19 @@ export const pythonJourney: Journey = {
           },
         },
         {
-          id: 'py-ch1-l3',
+          id: 'dart-ch1-l3',
           title: 'Mastery Challenge',
           description: 'Prove your knowledge with Mastery!',
           type: 'lesson-mastery',
           codingChallenge: {
             title: 'Mastery Challenge',
-            description: 'Show your mastery of Python print syntax and calculations.',
-            solution: 'print(5 * 5)\nprint("Finished")',
+            description: 'Show your mastery of Dart print syntax and calculations.',
+            solution: "print(5 * 5)\\nprint(\"Finished\")",
             hints: [
               'Use print(5 * 5) to print the numerical result.',
               'Use print("Finished") on the next line to output the completion message.'
             ],
-            starterCode: '# Calculate and print 5 * 5\n# On the next line, print "Finished"',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write a program that outputs the calculation and the completion message.',
             requiredOutput: '25\nFinished',
             xp: 15, // +5 bonus
@@ -98,16 +98,16 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch1-l4',
+          id: 'dart-ch1-l4',
           title: 'Variables',
-          description: 'Learn how to store data using variables in Python.',
+          description: 'Learn how to store data using variables in Dart.',
           type: 'lesson-all',
           codingChallenge: {
             title: 'Variables Challenge',
             description: 'Create and use variables.',
-            solution: 'x = 5\nprint(x)',
+            solution: "x = 5\\nprint(x)",
             hints: ['Assign the value 5 to a variable named x.', 'Use print(x) to output its value.'],
-            starterCode: '# Create variable x and print it',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write a program that stores the number 5 in a variable x and prints it.',
             requiredOutput: '5',
             xp: 10,
@@ -116,7 +116,7 @@ export const pythonJourney: Journey = {
           },
         },
         {
-          id: 'py-ch1-l5',
+          id: 'dart-ch1-l5',
           title: 'Chapter 1 Completed',
           description: 'Automatically completed when the previous lesson is done.',
           type: 'lesson-trophy',
@@ -129,7 +129,7 @@ export const pythonJourney: Journey = {
       description: 'Reusable blocks of code',
       lessons: [
         {
-          id: 'py-ch2-l1',
+          id: 'dart-ch2-l1',
           title: 'Introduction to Loops',
           description: 'Understand for and while loops.',
           type: 'lesson-theory',
@@ -174,19 +174,19 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l2',
+          id: 'dart-ch2-l2',
           title: 'The While Loop',
           description: 'Repeat code while a condition is True.',
           type: 'lesson-all',
           codingChallenge: {
             title: 'Counting Challenge',
             description: 'Write a while loop to print numbers.',
-            solution: 'i = 1\nwhile i <= 3:\n    print(i)\n    i += 1',
+            solution: "i = 1\\nwhile i <= 3:\\n    print(i)\\n    i += 1",
             hints: [
               'Write while followed by the condition i <= 3.',
               'Make sure you increment i by 1 (i += 1) inside the loop.'
             ],
-            starterCode: 'i = 1\n# Write a while loop to print i and increment it',
+            starterCode: "// Write your code here",
             challengeDescription: 'Print the numbers 1, 2, and 3 using a while loop.',
             requiredOutput: '1\n2\n3',
             xp: 15,
@@ -195,7 +195,7 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l3',
+          id: 'dart-ch2-l3',
           title: 'Introduction to Functions',
           description: 'Learn how to write reusable blocks of code.',
           type: 'lesson-theory',
@@ -240,20 +240,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l4',
+          id: 'dart-ch2-l4',
           title: 'Mastery Challenge',
           description: 'Prove your knowledge with Mastery!',
           type: 'lesson-mastery',
           codingChallenge: {
             title: 'Mastery Challenge',
             description: 'Write a complex function containing a loop.',
-            solution: 'def sum_even(n):\n    total = 0\n    for i in range(1, n + 1):\n        if i % 2 == 0:\n            total += i\n    return total\n\nprint(sum_even(5))',
+            solution: "def sum_even(n):\\n    total = 0\\n    for i in range(1, n + 1):\\n        if i % 2 == 0:\\n            total += i\\n    return total\\n\\nprint(sum_even(5))",
             hints: [
               'Use range(1, n + 1) to loop through 1 to n.',
               'Use the modulo operator % to check if a number is even (i % 2 == 0).',
               'Keep a running sum and return it after the loop.'
             ],
-            starterCode: 'def sum_even(n):\n    # Calculate and return the sum of even numbers from 1 to n\n    pass\n\n# Print the result of sum_even(5)',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write a function sum_even(n) that returns the sum of even numbers from 1 to n. Print the output of sum_even(5) (2 + 4 = 6).',
             requiredOutput: '6',
             xp: 20, // +5 bonus
@@ -262,20 +262,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l5',
+          id: 'dart-ch2-l5',
           title: 'Function Parameters',
           description: 'Test your understanding of functions.',
           type: 'lesson-challenge',
           codingChallenge: {
             title: 'Greeting Challenge',
             description: 'Define and invoke a function with an argument.',
-            solution: 'def greet(name):\n    print("Hello, " + name)\n\ngreet("Bob")',
+            solution: "def greet(name):\\n    print(\"Hello, \" + name)\\n\\ngreet(\"Bob\")",
             hints: [
               'Define greet with one parameter named name: def greet(name):',
               'Concatenate "Hello, " with name inside print().',
               'Call greet passing "Bob" as a string.'
             ],
-            starterCode: '# Define a function greet that takes name as a parameter\n# Call greet with "Bob"',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write a function greet(name) that prints "Hello, " followed by the name. Call it with "Bob".',
             requiredOutput: 'Hello, Bob',
             xp: 15,
@@ -284,19 +284,19 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l6',
+          id: 'dart-ch2-l6',
           title: 'Return Statement',
           description: 'Apply your knowledge in a mini-project.',
           type: 'lesson-project',
           codingChallenge: {
             title: 'Multiplication Challenge',
             description: 'Write a function that returns a value.',
-            solution: 'def multiply(a, b):\n    return a * b\n\nprint(multiply(3, 4))',
+            solution: "def multiply(a, b):\\n    return a * b\\n\\nprint(multiply(3, 4))",
             hints: [
               'Use the return keyword to return the result of a * b.',
               'Use print() to display the output of multiply(3, 4).'
             ],
-            starterCode: '# Define multiply function\n# Print multiply(3, 4)',
+            starterCode: "// Write your code here",
             challengeDescription: 'Create a function multiply(a, b) that returns their product. Print the value of multiply(3, 4).',
             requiredOutput: '12',
             xp: 15,
@@ -305,7 +305,7 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch2-l7',
+          id: 'dart-ch2-l7',
           title: 'Chapter 2 Completed',
           description: 'Automatically completed when the previous lesson is done.',
           type: 'lesson-trophy',
@@ -315,19 +315,19 @@ export const pythonJourney: Journey = {
     {
       id: 'ch3',
       title: 'Calculator',
-      description: 'Build a calculator in Python',
+      description: 'Build a calculator in Dart',
       lessons: [
         {
-          id: 'py-ch3-l1',
+          id: 'dart-ch3-l1',
           title: 'Simple Math Operations',
           description: 'Learn basic arithmetic operations.',
           type: 'lesson-challenge',
           codingChallenge: {
             title: 'Arithmetic Operators',
             description: 'Perform addition using variables.',
-            solution: 'a = 10\nb = 5\nprint(a + b)',
+            solution: "a = 10\\nb = 5\\nprint(a + b)",
             hints: ['Use the + operator.', 'Print the result of the addition.'],
-            starterCode: 'a = 10\nb = 5\n# Print the sum of a and b',
+            starterCode: "// Write your code here",
             challengeDescription: 'Print the sum of variables a and b.',
             requiredOutput: '15',
             xp: 20,
@@ -336,20 +336,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l2',
+          id: 'dart-ch3-l2',
           title: 'Calculator Step 1: Addition & Subtraction',
           description: 'Define functions for adding and subtracting.',
           type: 'lesson-project',
           codingChallenge: {
             title: 'Calculator Project 1',
             description: 'Write addition and subtraction helpers.',
-            solution: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\nprint(add(10, 5))\nprint(subtract(10, 5))',
+            solution: "def add(x, y):\\n    return x + y\\n\\ndef subtract(x, y):\\n    return x - y\\n\\nprint(add(10, 5))\\nprint(subtract(10, 5))",
             hints: [
               'Return x + y inside add(x, y).',
               'Return x - y inside subtract(x, y).',
               'Use print() to verify both functions.'
             ],
-            starterCode: '# Define add(x, y)\n# Define subtract(x, y)\n\n# Test functions by printing add(10, 5) and subtract(10, 5)',
+            starterCode: "// Write your code here",
             challengeDescription: 'Write add(x,y) and subtract(x,y) functions. Print add(10, 5) and subtract(10, 5) on separate lines.',
             requiredOutput: '15\n5',
             xp: 20,
@@ -358,20 +358,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l3',
+          id: 'dart-ch3-l3',
           title: 'Calculator Step 2: Multiplication & Division',
           description: 'Add multiplication and division to your calculator.',
           type: 'lesson-project',
           codingChallenge: {
             title: 'Calculator Project 2',
             description: 'Add helper functions for multiplication and division.',
-            solution: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\ndef multiply(x, y):\n    return x * y\n\ndef divide(x, y):\n    return x / y\n\nprint(multiply(10, 5))\nprint(divide(10, 5))',
+            solution: "def add(x, y):\\n    return x + y\\n\\ndef subtract(x, y):\\n    return x - y\\n\\ndef multiply(x, y):\\n    return x * y\\n\\ndef divide(x, y):\\n    return x / y\\n\\nprint(multiply(10, 5))\\nprint(divide(10, 5))",
             hints: [
               'Multiply using x * y.',
               'Divide using x / y.',
               'Print the results of multiply(10, 5) and divide(10, 5).'
             ],
-            starterCode: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\n# Define multiply(x, y)\n# Define divide(x, y)\n\n# Print multiply(10, 5) and divide(10, 5)',
+            starterCode: "// Write your code here",
             challengeDescription: 'Implement multiply(x, y) and divide(x, y) functions along with previous functions. Print the product and quotient of 10 and 5.',
             requiredOutput: '50\n2.0',
             xp: 20,
@@ -380,20 +380,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l4',
+          id: 'dart-ch3-l4',
           title: 'Calculator Step 3: Zero Division Handling',
           description: 'Handle errors safely in division.',
           type: 'lesson-mastery',
           codingChallenge: {
             title: 'Calculator Project 3',
             description: 'Prevent division by zero crashes.',
-            solution: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\ndef multiply(x, y):\n    return x * y\n\ndef divide(x, y):\n    if y == 0:\n        return "Error: Division by zero"\n    return x / y\n\nprint(divide(10, 0))',
+            solution: "def add(x, y):\\n    return x + y\\n\\ndef subtract(x, y):\\n    return x - y\\n\\ndef multiply(x, y):\\n    return x * y\\n\\ndef divide(x, y):\\n    if y == 0:\\n        return \"Error: Division by zero\"\\n    return x / y\\n\\nprint(divide(10, 0))",
             hints: [
               'Use if y == 0: inside divide().',
               'Return "Error: Division by zero" exactly if divisor is zero.',
               'Otherwise, return x / y.'
             ],
-            starterCode: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\ndef multiply(x, y):\n    return x * y\n\ndef divide(x, y):\n    # Update this function to handle y == 0\n    return x / y\n\nprint(divide(10, 0))',
+            starterCode: "// Write your code here",
             challengeDescription: 'Update your divide(x, y) function to return the string "Error: Division by zero" if y is 0. Print the result of divide(10, 0).',
             requiredOutput: 'Error: Division by zero',
             xp: 25, // +5 bonus
@@ -402,20 +402,20 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l5',
+          id: 'dart-ch3-l5',
           title: 'Calculator Step 4: Operations Menu',
           description: 'Create operation selection logic.',
           type: 'lesson-project',
           codingChallenge: {
             title: 'Calculator Project 4',
             description: 'Add selection menu function.',
-            solution: 'def add(x, y): return x + y\ndef subtract(x, y): return x - y\ndef multiply(x, y): return x * y\ndef divide(x, y):\n    if y == 0: return "Error: Division by zero"\n    return x / y\n\ndef calculate(choice, x, y):\n    if choice == 1:\n        return add(x, y)\n    elif choice == 2:\n        return subtract(x, y)\n    elif choice == 3:\n        return multiply(x, y)\n    elif choice == 4:\n        return divide(x, y)\n    else:\n        return "Invalid Choice"\n\nprint(calculate(1, 10, 5))\nprint(calculate(3, 10, 5))',
+            solution: "def add(x, y): return x + y\\ndef subtract(x, y): return x - y\\ndef multiply(x, y): return x * y\\ndef divide(x, y):\\n    if y == 0: return \"Error: Division by zero\"\\n    return x / y\\n\\ndef calculate(choice, x, y):\\n    if choice == 1:\\n        return add(x, y)\\n    elif choice == 2:\\n        return subtract(x, y)\\n    elif choice == 3:\\n        return multiply(x, y)\\n    elif choice == 4:\\n        return divide(x, y)\\n    else:\\n        return \"Invalid Choice\"\\n\\nprint(calculate(1, 10, 5))\\nprint(calculate(3, 10, 5))",
             hints: [
               'Use if/elif statements to match choice with functions.',
               'Choice 1 -> add, 2 -> subtract, 3 -> multiply, 4 -> divide.',
               'Return "Invalid Choice" in the else block.'
             ],
-            starterCode: 'def add(x, y): return x + y\ndef subtract(x, y): return x - y\ndef multiply(x, y): return x * y\ndef divide(x, y):\n    if y == 0: return "Error: Division by zero"\n    return x / y\n\ndef calculate(choice, x, y):\n    # Implement selection logic using if/elif/else\n    pass\n\n# Print calculate(1, 10, 5) and calculate(3, 10, 5)',
+            starterCode: "// Write your code here",
             challengeDescription: 'Create a function calculate(choice, x, y) that processes selections. Print results of calling calculate(1, 10, 5) and calculate(3, 10, 5).',
             requiredOutput: '15\n50',
             xp: 20,
@@ -424,7 +424,7 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l6',
+          id: 'dart-ch3-l6',
           title: 'Calculator Project Summary Quiz',
           description: 'Test your understanding of the complete calculator project.',
           type: 'lesson-all',
@@ -469,7 +469,7 @@ export const pythonJourney: Journey = {
           }
         },
         {
-          id: 'py-ch3-l7',
+          id: 'dart-ch3-l7',
           title: 'Chapter 3 Completed',
           description: 'Automatically completed when the previous lesson is done.',
           type: 'lesson-trophy',

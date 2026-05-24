@@ -16,7 +16,7 @@ interface AuthContextType {
     loading: boolean;
     refreshUser: () => Promise<void>;
     addJourney: (journeyId: string) => Promise<void>;
-    consumeEnergy: () => Promise<boolean>;
+    consumeEnergy: (amount?: number) => Promise<boolean>;
     completeLesson: (data: any) => Promise<void>;
     submitTask: (data: any) => Promise<void>;
     logout: () => void;
@@ -79,12 +79,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await fetchUser();
     };
 
-    const consumeEnergy = async () => {
+    const consumeEnergy = async (amount: number = 1) => {
         const token = localStorage.getItem('token');
         if (!token) return false;
         const res = await fetch('/api/user/energy/consume', {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ amount })
         });
         if (res.ok) {
             await fetchUser();

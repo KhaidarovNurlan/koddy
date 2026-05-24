@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useInView } from '../hooks/useInView';
+import { useAuth } from '../context/AuthContext';
 
 const languages = [
     { name: 'Python', icon: '/python-white.svg' },
@@ -279,6 +280,22 @@ function Leaderboard() {
 }
 
 export function Landing() {
+    const { user, journeys, loading } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && user) {
+            const lastJourneyId = localStorage.getItem('lastJourneyId');
+            if (lastJourneyId) {
+                navigate(`/journeys/${lastJourneyId}`);
+            } else if (journeys && journeys.length > 0) {
+                navigate(`/journeys/${journeys[journeys.length - 1]}`);
+            } else {
+                navigate('/journeys');
+            }
+        }
+    }, [user, journeys, loading, navigate]);
+
     useEffect(() => {
         document.title = "Learn to Code for Free with Koddy.Tech | Code Makes Perfect";
     }, []);

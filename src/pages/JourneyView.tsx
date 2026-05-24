@@ -1,13 +1,12 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { pythonJourney } from '../data/journeys';
-import type { Lesson } from '../data/journeys';
+import { allJourneys } from '../data/journeys';
+import type { Lesson, Journey } from '../data/journeys';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
-const getJourney = (id: string) => {
-    if (id === 'python') return pythonJourney;
-    return null;
+const getJourney = (id: string): Journey | null => {
+    return allJourneys[id] as Journey || null;
 };
 
 export const JourneyView = () => {
@@ -20,7 +19,7 @@ export const JourneyView = () => {
 
     useEffect(() => {
         document.title = `${journey?.title || 'Journey'} - Koddy`;
-        if (journeyId && journeyId !== 'python') {
+        if (journeyId && !allJourneys[journeyId]) {
             navigate('/journeys');
         } else if (journeyId) {
             localStorage.setItem('lastJourneyId', journeyId);
@@ -238,7 +237,7 @@ export const JourneyView = () => {
                                                                 }}
                                                                 className="w-full bg-grey hover:bg-primary-hover text-blue font-bold py-3 px-4 rounded-xl text-center uppercase tracking-wider border-2 border-grey-light shadow-[0_4px_0_0_#494D50] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#494D50] transition-all"
                                                             >
-                                                                START +10 XP
+                                                                START
                                                             </button>
                                                         </div>
                                                     </div>
@@ -280,7 +279,7 @@ export const JourneyView = () => {
                                                                                 }}
                                                                                 className="w-full bg-grey hover:bg-primary-hover text-blue font-bold py-3 px-4 rounded-xl text-center uppercase tracking-wider border-2 border-grey-light shadow-[0_4px_0_0_#494D50] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#494D50] transition-all"
                                                                             >
-                                                                                START +20 XP
+                                                                                START
                                                                             </button>
                                                                         </div>
                                                                     </div>

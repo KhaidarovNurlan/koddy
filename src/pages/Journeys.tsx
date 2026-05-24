@@ -6,7 +6,6 @@ const LANGUAGES = [
     { id: 'javascript', name: 'Javascript', codders: '0', icon: '/js.svg' },
     { id: 'java', name: 'Java', codders: '0', icon: '/java.svg' },
     { id: 'cpp', name: 'C++', codders: '0', icon: '/cpp.svg' },
-    { id: 'sqlite', name: 'SQLite', codders: '0', icon: '/sql.svg' },
     { id: 'c', name: 'C', codders: '0', icon: '/c.svg' },
     { id: 'csharp', name: 'C#', codders: '0', icon: '/csharp.svg' },
     { id: 'lua', name: 'Lua', codders: '0', icon: '/lua.svg' },
@@ -16,7 +15,6 @@ const LANGUAGES = [
     { id: 'rust', name: 'Rust', codders: '0', icon: '/rust.svg' },
     { id: 'r', name: 'R', codders: '0', icon: '/r.svg' },
     { id: 'ruby', name: 'Ruby', codders: '0', icon: '/ruby.svg' },
-    { id: 'terminal', name: 'Terminal', codders: '0', icon: '/terminal.svg' },
     { id: 'swift', name: 'Swift', codders: '0', icon: '/swift.svg' },
 ];
 
@@ -52,7 +50,7 @@ export const Journeys = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {LANGUAGES.map((lang) => {
                     const codersCount = stats[lang.id] !== undefined ? stats[lang.id] : 0;
-                    return lang.id === 'python' ? (
+                    return (
                         <Link
                             key={lang.id}
                             to={`/journeys/${lang.id}`}
@@ -73,27 +71,6 @@ export const Journeys = () => {
                                 {codersCount > 0 ? formatNumber(codersCount) : lang.codders} Codders
                             </p>
                         </Link>
-                    ) : (
-                        <div
-                            key={lang.id}
-                            className='relative flex flex-col items-center justify-center p-6 md:p-8 rounded-2xl border-2 border-b-5 transition-all border-grey-light bg-grey-dark opacity-50 cursor-not-allowed'
-                        >
-
-                            <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mb-4 md:mb-5">
-                                <img
-                                    src={lang.icon}
-                                    alt={lang.name}
-                                    className="w-full h-full object-contain"
-                                />
-                            </div>
-
-                            <h3 className="font-bold text-lg md:text-xl text-center">
-                                {lang.name}
-                            </h3>
-                            <p className="text-text-secondary text-xs md:text-sm mt-1.5 font-semibold text-center">
-                                {codersCount > 0 ? formatNumber(codersCount) : lang.codders} Codders
-                            </p>
-                        </div>
                     );
                 })}
             </div>

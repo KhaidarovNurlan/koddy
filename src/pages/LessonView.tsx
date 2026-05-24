@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { pythonJourney } from '../data/journeys';
+import type { Journey, Lesson, Chapter } from '../data/journeys';
+import { allJourneys } from '../data/journeys';
 import { useAuth } from '../context/AuthContext';
 
 const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: number, tokens: number, noMistakes: boolean) => void; onSkip: () => void }) => {
@@ -8,29 +9,29 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    
+
     const [failedQuestions, setFailedQuestions] = useState<any[]>([]);
     const [questionQueue, setQuestionQueue] = useState<any[]>([]);
     const [mistakes, setMistakes] = useState(0);
-    
+
     const handleStart = () => {
         setQuestionQueue([...quiz.questions]);
         setState('playing');
         setCurrentQuestionIndex(0);
         setFailedQuestions([]);
     };
-    
+
     const currentQuestion = questionQueue[currentQuestionIndex];
-    
+
     const handleSubmit = () => {
         if (selectedOptionIndex === null) return;
         setIsSubmitted(true);
     };
-    
+
     const handleContinue = () => {
         const option = currentQuestion.options[selectedOptionIndex!];
         let newFailedQuestions = [...failedQuestions];
-        
+
         if (!option.isCorrect) {
             setMistakes(m => m + 1);
             if (!newFailedQuestions.find(q => q.id === currentQuestion.id)) {
@@ -38,7 +39,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                 setFailedQuestions(newFailedQuestions);
             }
         }
-        
+
         if (currentQuestionIndex < questionQueue.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedOptionIndex(null);
@@ -71,19 +72,19 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [state, isSubmitted, selectedOptionIndex, currentQuestionIndex, failedQuestions, questionQueue]);
-    
+
     if (state === 'intro') {
         return (
             <div className="flex-1 flex flex-col items-center justify-center bg-grey-dark">
                 <h2 className="text-2xl font-bold mb-8 text-white">Ready To Start Quiz?</h2>
                 <div className="flex flex-col gap-4 w-[280px]">
-                    <button 
+                    <button
                         onClick={handleStart}
                         className="w-full inline-flex items-center justify-center px-10 py-3.5 cursor-pointer bg-blue text-white font-bold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]"
                     >
                         START QUIZ
                     </button>
-                    <button 
+                    <button
                         onClick={onSkip}
                         className="w-full inline-flex items-center justify-center px-10 py-3.5 bg-grey text-white font-bold rounded-xl transition-all border-grey-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]"
                     >
@@ -97,7 +98,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
             </div>
         );
     }
-    
+
     const progress = (currentQuestionIndex / questionQueue.length) * 100;
     const isCorrect = isSubmitted && selectedOptionIndex !== null && currentQuestion.options[selectedOptionIndex].isCorrect;
 
@@ -108,12 +109,11 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     <p className="text-sm font-semibold mb-6 text-white">{currentQuestion.question}</p>
                     <div className="flex flex-col gap-2 mb-6">
                         {currentQuestion.options.map((opt: any, idx: number) => (
-                            <div 
+                            <div
                                 key={idx}
                                 onClick={() => !isSubmitted && setSelectedOptionIndex(idx)}
-                                className={`flex items-center bg-[#1c1c1c] border rounded-lg cursor-pointer transition-colors p-3 ${
-                                    selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:bg-grey'
-                                }`}
+                                className={`flex items-center bg-[#1c1c1c] border rounded-lg cursor-pointer transition-colors p-3 ${selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:bg-grey'
+                                    }`}
                             >
                                 <div className="w-8 text-center text-text-secondary font-mono text-xs border-r border-grey-lighter pr-2 mr-3">{idx + 1}</div>
                                 <div className="font-mono text-sm text-white/90">{opt.text}</div>
@@ -124,7 +124,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                 </div>
             );
         }
-        
+
         if (currentQuestion.type === 'multiple-choice') {
             return (
                 <div className="w-full max-w-[600px] mt-8">
@@ -136,12 +136,11 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     )}
                     <div className="flex flex-col gap-3">
                         {currentQuestion.options.map((opt: any, idx: number) => (
-                            <div 
+                            <div
                                 key={idx}
                                 onClick={() => !isSubmitted && setSelectedOptionIndex(idx)}
-                                className={`flex items-center bg-grey border rounded-xl cursor-pointer transition-colors p-4 ${
-                                    selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:border-grey-lighter'
-                                }`}
+                                className={`flex items-center bg-grey border rounded-xl cursor-pointer transition-colors p-4 ${selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:border-grey-lighter'
+                                    }`}
                             >
                                 <div className="w-6 h-6 rounded flex items-center justify-center bg-[#1c1c1c] text-text-secondary font-bold text-xs mr-4">{idx + 1}</div>
                                 <div className="font-semibold text-sm text-white/90">{opt.text}</div>
@@ -154,7 +153,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
 
         if (currentQuestion.type === 'fill-in-blank') {
             const parts = currentQuestion.codeSnippet?.split('___') || [];
-            
+
             return (
                 <div className="w-full max-w-[600px] mt-8">
                     <p className="text-sm font-semibold mb-6 text-white">{currentQuestion.question}</p>
@@ -170,12 +169,11 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     </div>
                     <div className="flex flex-col gap-3">
                         {currentQuestion.options.map((opt: any, idx: number) => (
-                            <div 
+                            <div
                                 key={idx}
                                 onClick={() => !isSubmitted && setSelectedOptionIndex(idx)}
-                                className={`flex items-center bg-grey border rounded-xl cursor-pointer transition-colors p-4 ${
-                                    selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:border-grey-lighter'
-                                }`}
+                                className={`flex items-center bg-grey border rounded-xl cursor-pointer transition-colors p-4 ${selectedOptionIndex === idx ? 'border-blue-light bg-blue-light/10' : 'border-grey-light hover:border-grey-lighter'
+                                    }`}
                             >
                                 <div className="w-6 h-6 rounded flex items-center justify-center bg-[#1c1c1c] text-text-secondary font-bold text-xs mr-4">{idx + 1}</div>
                                 <div className="font-semibold text-sm text-white/90">{opt.text}</div>
@@ -185,7 +183,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                 </div>
             );
         }
-        
+
         return null;
     };
 
@@ -198,7 +196,7 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     </svg>
                 </button>
                 <div className="flex-1 max-w-[800px] mx-auto h-2.5 bg-grey rounded-full overflow-hidden">
-                    <div 
+                    <div
                         className="h-full bg-blue-light transition-all duration-300 rounded-full"
                         style={{ width: `${progress}%` }}
                     />
@@ -219,11 +217,10 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                         <button
                             onClick={handleSubmit}
                             disabled={selectedOptionIndex === null}
-                            className={`w-full py-3.5 rounded-xl font-bold uppercase transition-all border-b-4 flex items-center justify-center ${
-                                selectedOptionIndex !== null 
-                                ? 'bg-blue text-white border-blue-dark hover:brightness-110 active:border-b-2 active:translate-y-[2px]' 
+                            className={`w-full py-3.5 rounded-xl font-bold uppercase transition-all border-b-4 flex items-center justify-center ${selectedOptionIndex !== null
+                                ? 'bg-blue text-white border-blue-dark hover:brightness-110 active:border-b-2 active:translate-y-[2px]'
                                 : 'bg-grey text-text-secondary border-grey-light cursor-not-allowed'
-                            }`}
+                                }`}
                         >
                             Submit <span className="text-xs bg-black/20 px-2 py-1 rounded ml-2 normal-case">Enter ↵</span>
                         </button>
@@ -234,9 +231,8 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
                     <div className="w-full max-w-[600px]">
                         <div className="flex items-start justify-between mb-6">
                             <div className="flex items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 shrink-0 ${
-                                    isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                                }`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 shrink-0 ${isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                                    }`}>
                                     {isCorrect ? (
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -273,10 +269,10 @@ const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: nu
 
 const HintItem = ({ hint, index, onReveal }: { hint: string; index: number; onReveal: () => void }) => {
     const [isOpen, setIsOpen] = useState(false);
-    
+
     return (
         <div className="border border-grey-lighter rounded-xl bg-[#1c1c1c] overflow-hidden mb-2">
-            <div 
+            <div
                 className="p-3 flex justify-between items-center cursor-pointer hover:bg-grey-dark transition-colors"
                 onClick={() => {
                     if (!isOpen) onReveal();
@@ -300,22 +296,22 @@ const HintItem = ({ hint, index, onReveal }: { hint: string; index: number; onRe
     );
 };
 
-const LessonCompletedModal = ({ 
-    xp, 
-    tokens, 
+const LessonCompletedModal = ({
+    xp,
+    tokens,
     energy = 1,
-    firstTry, 
-    noMistakes, 
-    isQuiz, 
-    onContinue 
-}: { 
-    xp: number, 
-    tokens: number, 
+    firstTry,
+    noMistakes,
+    isQuiz,
+    onContinue
+}: {
+    xp: number,
+    tokens: number,
     energy?: number,
-    firstTry?: boolean, 
-    noMistakes?: boolean, 
+    firstTry?: boolean,
+    noMistakes?: boolean,
     isQuiz?: boolean,
-    onContinue: () => void 
+    onContinue: () => void
 }) => {
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
@@ -325,9 +321,9 @@ const LessonCompletedModal = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                
+
                 <h2 className="text-2xl font-bold text-white mb-2">Lesson Completed!</h2>
-                
+
                 <div className="flex gap-4 w-full my-6">
                     <div className="flex-1 bg-[#1c1c1c] border border-grey-light rounded-2xl p-4 flex flex-col items-center justify-center">
                         <span className="text-blue-light font-bold text-2xl mb-1">+{xp}</span>
@@ -348,12 +344,12 @@ const LessonCompletedModal = ({
                         <div className="w-full bg-[#1c1c1c] border border-grey-light rounded-xl p-3 mb-6 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-yellow-500/20 p-2 rounded-lg">
-                                    <span className="text-xl">🏆</span>
+                                    <span className="text-xl">🎯</span>
                                 </div>
-                                <span className="font-bold text-white text-sm">No Mistakes Bonus!</span>
+                                <span className="font-bold text-white text-sm">No Mistakes!</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-orange font-bold text-sm">+5</span>
+                                <span className="text-orange font-bold text-sm">+1</span>
                                 <img src="/token.svg" className="w-4 h-4" alt="tokens" />
                             </div>
                         </div>
@@ -365,10 +361,10 @@ const LessonCompletedModal = ({
                                 <div className="bg-yellow-500/20 p-2 rounded-lg">
                                     <span className="text-xl">🎯</span>
                                 </div>
-                                <span className="font-bold text-white text-sm">First Try Bonus!</span>
+                                <span className="font-bold text-white text-sm">First Try!</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-orange font-bold text-sm">+5</span>
+                                <span className="text-orange font-bold text-sm">+1</span>
                                 <img src="/token.svg" className="w-4 h-4" alt="tokens" />
                             </div>
                         </div>
@@ -389,12 +385,12 @@ const LessonCompletedModal = ({
 export const LessonView = () => {
     const { journeyId, lessonId } = useParams();
     const navigate = useNavigate();
-    const { user, completeLesson, consumeEnergy } = useAuth();
+    const { user, completeLesson, consumeEnergy, submitTask } = useAuth();
 
-    const journey = journeyId === 'python' ? pythonJourney : null;
+    const journey = (journeyId ? allJourneys[journeyId] : null) as Journey | null;
 
-    let lesson = null;
-    let chapter = null;
+    let lesson: Lesson | null = null;
+    let chapter: Chapter | null = null;
 
     if (journey) {
         for (const c of journey.chapters) {
@@ -407,6 +403,8 @@ export const LessonView = () => {
         }
     }
 
+    const quiz = lesson?.quiz;
+
     const [isSolutionOpen, setIsSolutionOpen] = useState(false);
     const [showSolutionModal, setShowSolutionModal] = useState(false);
     const [showResetModal, setShowResetModal] = useState(false);
@@ -417,9 +415,36 @@ export const LessonView = () => {
     const [code, setCode] = useState(lesson?.codingChallenge?.starterCode || '');
     const [output, setOutput] = useState<string>('');
     const [hintsUsed, setHintsUsed] = useState(false);
-    
+
     const [showCompletionModal, setShowCompletionModal] = useState(false);
-    const [completedData, setCompletedData] = useState<{xp: number, tokens: number, energy?: number, firstTry?: boolean, noMistakes?: boolean, isQuiz?: boolean} | null>(null);
+    const [completedData, setCompletedData] = useState<{ xp: number, tokens: number, energy?: number, firstTry?: boolean, noMistakes?: boolean, isQuiz?: boolean } | null>(null);
+
+    const [isRunning, setIsRunning] = useState(false);
+    const [submissions, setSubmissions] = useState<any[]>([]);
+    const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+
+    const fetchSubmissions = async () => {
+        if (!lesson) return;
+        setLoadingSubmissions(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`/api/user/lessons/submissions/${lesson.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setSubmissions(data.submissions || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch submissions:', err);
+        } finally {
+            setLoadingSubmissions(false);
+        }
+    };
+
+    const handleLoadSubmission = (subCode: string) => {
+        setCode(subCode);
+    };
 
     useEffect(() => {
         if (lesson?.codingChallenge) {
@@ -427,11 +452,17 @@ export const LessonView = () => {
             setIsSolutionOpen(false);
             setIsTheoryHidden(false);
         }
-        
+
         if (user && user.energy <= 0) {
             navigate(`/journeys/${journeyId}`);
         }
     }, [lesson, user?.energy, navigate, journeyId]);
+
+    useEffect(() => {
+        if (activeTab === 'submissions') {
+            fetchSubmissions();
+        }
+    }, [activeTab, lesson?.id]);
 
     if (!lesson) {
         return <div className="p-10 text-center text-white">Lesson not found</div>;
@@ -467,42 +498,95 @@ export const LessonView = () => {
             xp: completedData.xp,
             tokens: completedData.tokens
         });
-        await consumeEnergy();
+        await consumeEnergy(completedData.energy);
         navigate(`/journeys/${journeyId}`);
     };
 
-    const handleRunCode = () => {
-        if (!lesson?.codingChallenge) return;
-        
-        const reqOutput = lesson.codingChallenge.requiredOutput;
-        const hasCorrectOutput = code.includes(reqOutput);
-        
-        if (hasCorrectOutput) {
-            setOutput(reqOutput);
-            
-            const firstTry = !hintsUsed;
-            const challengeXp = lesson.codingChallenge.xp + (firstTry ? 10 : 0);
-            const challengeTokens = isSolutionOpen ? 0 : (lesson.codingChallenge.tokens + (firstTry ? 5 : 0));
-            
-            setCompletedData({
-                xp: challengeXp,
-                tokens: challengeTokens,
-                energy: 1,
-                firstTry,
-                isQuiz: false
+    const handleRunCode = async () => {
+        if (!lesson?.codingChallenge || isRunning) return;
+
+        setIsRunning(true);
+        setOutput('Executing code...');
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/user/code/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    language: journey?.language || 'python',
+                    code
+                })
             });
-            setShowCompletionModal(true);
-        } else {
-            setOutput('Error: Output does not match expected result or syntax error occurred.');
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({ error: 'Unknown server error' }));
+                setOutput(`Error: ${errData.error || res.statusText}`);
+                setIsRunning(false);
+                return;
+            }
+
+            const data = await res.json();
+
+            let finalOutput = '';
+            if (data.stderr) {
+                finalOutput = data.stderr;
+                setOutput(finalOutput);
+            } else {
+                finalOutput = data.stdout;
+                if (!finalOutput || finalOutput.trim() === '') {
+                    finalOutput = 'Program executed with no output';
+                }
+                setOutput(finalOutput);
+            }
+
+            const reqOutput = lesson.codingChallenge.requiredOutput;
+            const trimmedStdout = data.stdout ? data.stdout.trim() : '';
+            const trimmedExpected = reqOutput ? reqOutput.trim() : '';
+            const isPassed = !data.stderr && trimmedStdout === trimmedExpected;
+
+            await submitTask({
+                journeyId,
+                lessonId: lesson.id,
+                taskId: 'challenge',
+                code,
+                passed: isPassed
+            });
+
+            fetchSubmissions();
+
+            if (isPassed) {
+                const firstTry = !hintsUsed;
+                const challengeXp = lesson.codingChallenge.xp;
+                const challengeEnergy = lesson.codingChallenge.energy !== undefined ? lesson.codingChallenge.energy : 1;
+                const challengeTokens = isSolutionOpen ? 0 : (lesson.codingChallenge.tokens + (firstTry ? 1 : 0));
+
+                setCompletedData({
+                    xp: challengeXp,
+                    tokens: challengeTokens,
+                    energy: challengeEnergy,
+                    firstTry,
+                    isQuiz: false
+                });
+                setShowCompletionModal(true);
+            }
+        } catch (err: any) {
+            console.error(err);
+            setOutput(`Execution failed: ${err.message}`);
+        } finally {
+            setIsRunning(false);
         }
     };
 
     return (
         <div className="flex h-screen w-full bg-grey-dark text-white overflow-hidden relative">
             {showCompletionModal && completedData && (
-                <LessonCompletedModal 
-                    {...completedData} 
-                    onContinue={finishLesson} 
+                <LessonCompletedModal
+                    {...completedData}
+                    onContinue={finishLesson}
                 />
             )}
 
@@ -560,21 +644,21 @@ export const LessonView = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
-                        
+
                         <div className="mb-4">
                             <label className="block text-sm font-bold text-white mb-2">Project Name</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 className="w-full bg-transparent border border-blue-light rounded-lg p-2.5 text-sm text-white focus:outline-none"
                                 defaultValue={lesson?.title || ''}
                             />
                         </div>
-                        
+
                         <div className="mb-6">
                             <label className="block text-sm font-bold text-white mb-2">
                                 Description <span className="text-text-secondary font-normal">— optional</span>
                             </label>
-                            <textarea 
+                            <textarea
                                 className="w-full bg-[#1c1c1c] border border-grey-light rounded-lg p-3 text-sm text-white h-24 resize-none placeholder-text-secondary focus:outline-none focus:border-blue-light"
                                 placeholder="What does this code do?"
                             ></textarea>
@@ -606,31 +690,31 @@ export const LessonView = () => {
             )}
 
             <div className="w-[60px] bg-grey-dark border-r border-grey-lighter shrink-0 flex flex-col items-center py-4 z-20">
-                <div className="flex-1 flex flex-col items-center pt-2">
-                    <img 
-                        src="/lesson-white.svg" 
-                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'lesson' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`} 
-                        alt="lesson" 
+                <div className="flex-1 flex flex-col items-center pt-1">
+                    <img
+                        src="/lesson-white.svg"
+                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'lesson' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                        alt="lesson"
                         onClick={() => setActiveTab('lesson')}
                     />
                 </div>
-                <div className="flex flex-col gap-6 items-center text-text-secondary pb-4">
-                    <img 
-                        src="/submissions-white.svg" 
-                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`} 
-                        alt="history" 
+                <div className="flex flex-col gap-6 items-center text-text-secondary pb-2">
+                    <img
+                        src="/submissions-white.svg"
+                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'submissions' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                        alt="history"
                         onClick={() => setActiveTab('submissions')}
                     />
-                    <img 
-                        src="/support-white.svg" 
-                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'support' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`} 
-                        alt="support" 
+                    <img
+                        src="/support-white.svg"
+                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'support' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                        alt="support"
                         onClick={() => setActiveTab('support')}
                     />
-                    <img 
-                        src="/feedback-white.svg" 
-                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'feedback' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`} 
-                        alt="feedback" 
+                    <img
+                        src="/feedback-white.svg"
+                        className={`w-5 h-5 cursor-pointer transition-opacity ${activeTab === 'feedback' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                        alt="feedback"
                         onClick={() => setActiveTab('feedback')}
                     />
                 </div>
@@ -643,149 +727,164 @@ export const LessonView = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </Link>
-                    <span className="font-semibold text-sm">{chapter?.title}</span>
+                    <span className="font-semibold text-lg">{chapter?.title}</span>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-5 scrollbar-thin">
                     {activeTab === 'lesson' && (
                         <>
                             <div className="flex items-start justify-between mb-3">
-                        {!isTheoryHidden ? (
-                            <h2 className="text-xl font-bold pr-2">{lesson.title}</h2>
-                        ) : (
-                            <div></div>
-                        )}
-                        <div className="flex gap-1 shrink-0 mt-1">
-                            <button
-                                onClick={() => setIsTheoryHidden(!isTheoryHidden)}
-                                className="text-[10px] uppercase font-bold px-2 py-1 border border-grey-light text-text-secondary rounded hover:brightness-110 transition-all"
-                            >
-                                {isTheoryHidden ? 'Show' : 'Hide'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {!isTheoryHidden && (
-                        <div className="text-text-secondary text-sm mb-8 leading-relaxed whitespace-pre-wrap">
-                            {lesson.description}
-                        </div>
-                    )}
-
-                    {lesson.codingChallenge && (
-                        <>
-                            <div className="mb-6">
-                                <h3 className="flex items-center font-bold text-white mb-3 text-sm">
-                                    <svg className="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                    </svg>
-                                    Challenge
-                                </h3>
-                                <p className="text-sm text-text-secondary mb-4">{lesson.codingChallenge.challengeDescription}</p>
-                                <p className="text-sm font-bold text-white mb-2">What to do:</p>
-                                <ol className="list-decimal pl-4 text-sm text-text-secondary mb-4 space-y-1">
-                                    <li>Look at the code</li>
-                                    <li>Press the "Run Code" button to execute it</li>
-                                    <li>You should see {lesson.codingChallenge.requiredOutput} appear in the output</li>
-                                </ol>
-                                <button className="text-blue-light border border-blue-light/30 rounded-lg px-4 py-1.5 text-xs font-semibold hover:bg-blue-light/10 transition-colors">
-                                    Explain challenge
-                                </button>
-                            </div>
-
-                                {lesson.codingChallenge.hints && lesson.codingChallenge.hints.length > 0 && (
-                                    <div className="mb-6 pt-4 border-t border-grey-lighter">
-                                        <h3 className="flex items-center font-bold text-white mb-3 text-lg">
-                                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                                            </svg>
-                                            Hints
-                                        </h3>
-                                        <div className="flex flex-col">
-                                            {lesson.codingChallenge.hints.map((hint, idx) => (
-                                                <HintItem key={idx} index={idx} hint={hint} onReveal={() => setHintsUsed(true)} />
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                            <div className="mb-4 pt-4">
-                                <h3
-                                    className="flex items-center font-bold text-white mb-3 cursor-pointer text-sm"
-                                    onClick={() => !isSolutionOpen && setShowSolutionModal(true)}
-                                >
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                    Solution
-                                </h3>
-
-                                {isSolutionOpen ? (
-                                    <div className="border border-grey-lighter rounded-xl p-4 bg-grey-dark">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div className="text-sm">
-                                                Solution<br />
-                                                <span className="text-text-secondary text-xs">Revealed</span>
-                                            </div>
-                                            <svg className="w-5 h-5 text-text-secondary cursor-pointer hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" onClick={() => setIsSolutionOpen(false)}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                            </svg>
-                                        </div>
-                                        <div className="bg-grey border border-grey-light p-3 rounded-lg font-mono text-sm mb-4 text-white/90 whitespace-pre-wrap">
-                                            {lesson.codingChallenge.solution}
-                                        </div>
-                                        <div className="flex flex-col gap-3">
-                                            <button
-                                                onClick={handleCopyToEditor}
-                                                className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit"
-                                            >
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                                </svg>
-                                                Copy to code editor
-                                            </button>
-                                            <button className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit">
-                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Explain solution
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div
-                                        onClick={() => setShowSolutionModal(true)}
-                                        className="border border-grey-lighter rounded-xl p-3 bg-[#1c1c1c] flex justify-between items-center cursor-pointer hover:bg-grey-dark transition-colors"
+                                <h2 className="text-xl font-bold pr-2">{lesson.title}</h2>
+                                <div className="flex gap-1 shrink-0 mt-1">
+                                    <button
+                                        onClick={() => setIsTheoryHidden(!isTheoryHidden)}
+                                        className="text-[10px] uppercase font-bold px-2 py-1 border border-grey-light text-text-secondary rounded hover:brightness-110 transition-all"
                                     >
-                                        <span className="text-sm text-white/80">Solution</span>
-                                        <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </div>
-                                )}
+                                        {isTheoryHidden ? 'Show Theory' : 'Hide'}
+                                    </button>
+                                </div>
                             </div>
-                        </>
-                    )}
+
+                            {!isTheoryHidden && (
+                                <div className="text-text-secondary text-sm mb-8 leading-relaxed whitespace-pre-wrap">
+                                    {lesson.description}
+                                </div>
+                            )}
+
+                            {lesson.codingChallenge && (
+                                <>
+                                    <div className="mb-6">
+                                        <h3 className="flex items-center font-bold text-white mb-3 gap-2 text-sm">
+                                            <img src="/challenge-white.svg" className="w-4 h-4 mb-1" />
+                                            Challenge
+                                        </h3>
+                                        <p className="text-sm text-text-secondary mb-4">{lesson.codingChallenge.challengeDescription}</p>
+                                        <p className="text-sm font-bold text-white mb-2">What to do:</p>
+                                        <ol className="list-decimal pl-4 text-sm text-text-secondary mb-4 space-y-1">
+                                            <li>Look at the code</li>
+                                            <li>Press the "Run Code" button to execute it</li>
+                                            <li>You should see {lesson.codingChallenge.requiredOutput} appear in the output</li>
+                                        </ol>
+                                        <button className="flex flex-row items-center text-blue-light border border-blue-light/30 rounded-lg px-2 gap-2 py-1.5 text-xs font-semibold hover:bg-blue-light/10 transition-colors">
+                                            <img src="/ai-main.svg" className="w-4 h-4" />Explain challenge
+                                        </button>
+                                    </div>
+
+                                    {lesson.codingChallenge.hints && lesson.codingChallenge.hints.length > 0 && (
+                                        <div className="mb-6 pt-4 border-t border-grey-lighter">
+                                            <h3 className="flex items-center font-bold text-white mb-3 gap-2 text-sm">
+                                                <img src="/hint-white.svg" className="w-4 h-4 mb-0.25" />
+                                                Hints
+                                            </h3>
+                                            <div className="flex flex-col">
+                                                {lesson.codingChallenge.hints.map((hint, idx) => (
+                                                    <HintItem key={idx} index={idx} hint={hint} onReveal={() => setHintsUsed(true)} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="mb-4 pt-4">
+                                        <h3
+                                            className="flex items-center font-bold text-white mb-3 gap-2 cursor-pointer text-sm"
+                                            onClick={() => !isSolutionOpen && setShowSolutionModal(true)}
+                                        >
+                                            <img src="/solution-white.svg" className="w-4 h-4 mb-0.25" />
+                                            Solution
+                                        </h3>
+
+                                        {isSolutionOpen ? (
+                                            <div className="border border-grey-lighter rounded-xl p-4 bg-grey-dark">
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div className="text-sm">
+                                                        Solution<br />
+                                                        <span className="text-text-secondary text-xs">Revealed</span>
+                                                    </div>
+                                                    <svg className="w-5 h-5 text-text-secondary cursor-pointer hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" onClick={() => setIsSolutionOpen(false)}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                    </svg>
+                                                </div>
+                                                <div className="bg-grey border border-grey-light p-3 rounded-lg font-mono text-sm mb-4 text-white/90 whitespace-pre-wrap">
+                                                    {lesson.codingChallenge.solution}
+                                                </div>
+                                                <div className="flex flex-col gap-3">
+                                                    <button
+                                                        onClick={handleCopyToEditor}
+                                                        className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit"
+                                                    >
+                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                        </svg>
+                                                        Copy to code editor
+                                                    </button>
+                                                    <button className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit">
+                                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Explain solution
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                onClick={() => setShowSolutionModal(true)}
+                                                className="border border-grey-lighter rounded-xl p-3 bg-[#1c1c1c] flex justify-between items-center cursor-pointer hover:bg-grey-dark transition-colors"
+                                            >
+                                                <span className="text-sm text-white/80">Solution</span>
+                                                <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </>
                     )}
                     {activeTab === 'submissions' && (
                         <>
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold">Last submissions</h2>
-                                <img src="/reload-white.svg" className="w-4 h-4 opacity-70 hover:opacity-100 cursor-pointer" alt="reload" />
+                                <img src="/reload-white.svg" className="w-4 h-4 opacity-70 hover:opacity-100 cursor-pointer" alt="reload" onClick={fetchSubmissions} />
                             </div>
-                            <div className="border-t border-grey-lighter pt-3 flex justify-between items-center text-sm cursor-pointer hover:bg-grey p-2 rounded-lg -mx-2">
-                                <div className="flex items-center gap-3">
-                                    <svg className="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-white/90">5/17/2026, 4:08:15 PM</span>
-                                    <span className="text-text-secondary">&bull;</span>
-                                    <span className="text-text-secondary">{journey?.language ? journey.language.charAt(0).toUpperCase() + journey.language.slice(1) : 'Python'}</span>
+                            {loadingSubmissions ? (
+                                <div className="text-sm text-text-secondary">Loading submissions...</div>
+                            ) : submissions.length === 0 ? (
+                                <div className="text-sm text-text-secondary">No submissions yet for this lesson.</div>
+                            ) : (
+                                <div className="flex flex-col gap-2 max-h-[350px] overflow-y-auto">
+                                    {submissions.map((sub: any) => (
+                                        <div
+                                            key={sub.id}
+                                            onClick={() => handleLoadSubmission(sub.code)}
+                                            className="border-t border-grey-lighter pt-3 flex justify-between items-center text-sm cursor-pointer hover:bg-grey p-2 rounded-lg -mx-2 transition-colors"
+                                            title="Click to load this code into editor"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                {sub.passed ? (
+                                                    <svg className="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                                    </svg>
+                                                )}
+                                                <span className="text-white/90 font-medium">
+                                                    {new Date(sub.submittedAt).toLocaleString()}
+                                                </span>
+                                                <span className="text-text-secondary">&bull;</span>
+                                                <span className="text-text-secondary">
+                                                    {journey?.language ? journey.language.charAt(0).toUpperCase() + journey.language.slice(1) : 'Python'}
+                                                </span>
+                                            </div>
+                                            <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                    ))}
                                 </div>
-                                <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
+                            )}
                         </>
                     )}
                     {activeTab === 'support' && (
@@ -794,7 +893,7 @@ export const LessonView = () => {
                             <p className="text-[11px] text-text-secondary mb-6">
                                 Context: <span className="font-bold text-white/80">{chapter?.title} - {lesson.title}</span>
                             </p>
-                            <textarea 
+                            <textarea
                                 className="w-full bg-transparent border border-grey-light rounded p-3 text-sm text-white/90 mb-4 h-32 resize-none placeholder-text-secondary focus:outline-none focus:border-blue-light"
                                 placeholder="I am missing/need help with..."
                             ></textarea>
@@ -832,7 +931,7 @@ export const LessonView = () => {
             </div>
 
             <div className="flex-1 flex flex-col bg-[#1c1c1c] relative z-0">
-                <div className="h-[50px] bg-grey-dark border-b border-grey-lighter flex justify-end items-center px-6 gap-5 text-sm font-bold shadow-sm z-10">
+                <div className="h-[61px] bg-grey-dark border-b border-grey-lighter flex justify-end items-center px-6 gap-5 text-sm font-bold shadow-sm z-10">
                     <div className="flex items-center">
                         <span className="text-white mr-1.5">0</span>
                         <img src="/fire-filled.svg" className="w-4 h-4" alt="streak" />
@@ -848,27 +947,29 @@ export const LessonView = () => {
                     <img src="/avatar_placeholder.png" className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
                 </div>
 
-                {lesson.quiz ? (
-                    <QuizView 
-                        quiz={lesson.quiz} 
+                {quiz ? (
+                    <QuizView
+                        quiz={quiz}
                         onComplete={(xp, tokens, noMistakes) => {
-                            const xpEarned = xp + (noMistakes ? 10 : 0);
-                            const tokensEarned = tokens + (noMistakes ? 5 : 0);
-                            
+                            const tokensEarned = tokens + (noMistakes ? 1 : 0);
+                            const quizEnergy = quiz.energy !== undefined ? quiz.energy : 1;
+
                             setCompletedData({
-                                xp: xpEarned,
+                                xp,
                                 tokens: tokensEarned,
-                                energy: 1,
+                                energy: quizEnergy,
                                 noMistakes,
                                 isQuiz: true
                             });
                             setShowCompletionModal(true);
-                        }} 
+                        }}
                         onSkip={() => {
+                            const quizEnergy = quiz.energy !== undefined ? quiz.energy : 1;
+
                             setCompletedData({
                                 xp: 0,
                                 tokens: 0,
-                                energy: 1,
+                                energy: quizEnergy,
                                 noMistakes: false,
                                 isQuiz: true
                             });
@@ -878,7 +979,7 @@ export const LessonView = () => {
                 ) : lesson.codingChallenge ? (
                     <div className="flex-1 flex flex-col">
                         <div className="h-[40px] bg-grey-dark border-b border-grey-lighter flex justify-between items-center px-4 shrink-0 select-none">
-                            <div className="bg-[#1c1c1c] text-xs text-white/90 px-4 py-2 border-t-2 border-blue-light font-semibold rounded-t-lg mt-[6px]">
+                            <div className="bg-[#1c1c1c] text-xs text-white/90 px-4 ml-6 py-2 border-t-2 border-blue-light font-semibold rounded-t-lg mt-[6px]">
                                 {journey?.language ? journey.language.charAt(0).toUpperCase() + journey.language.slice(1) : 'Python'}
                             </div>
                             <div className="flex items-center gap-3">
@@ -914,25 +1015,35 @@ export const LessonView = () => {
                                     spellCheck={false}
                                 />
                             </div>
- 
+
                             <div className="absolute bottom-4 right-4 flex gap-3 z-10">
-                                <button className="bg-grey-lighter text-white/80 px-4 py-2 rounded-lg flex items-center text-sm font-semibold border border-grey-light hover:brightness-110 transition-all">
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                    </svg>
+                                <button className="bg-blue text-white px-2 pr-4 gap-2 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all">
+                                    <img src="/ai-assistant.svg" className="w-6 h-6" />
                                     Ask AI
                                 </button>
-                                <button onClick={handleRunCode} className="bg-blue text-white px-5 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all shadow-[0_0_15px_rgba(27,120,160,0.5)]">
-                                    <img src="/play-white.svg" className="w-4 h-4 mr-2" alt="run" />
-                                    Run Code
+                                <button
+                                    onClick={handleRunCode}
+                                    disabled={isRunning}
+                                    className={`bg-blue text-white px-2 pr-4 gap-2 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all ${isRunning ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                >
+                                    {isRunning ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                            </svg>
+                                            Running...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <img src="/play-white.svg" className="w-6 h-6" alt="run" />
+                                            Run Code
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
                         <div className="h-[280px] bg-grey-dark border-t border-grey-lighter flex flex-col shadow-inner z-10">
-                            <div className="flex text-xs font-bold text-text-secondary border-b border-grey-lighter bg-grey-dark pt-2 px-2">
-                                <div className="px-4 py-2 border-b-2 border-white text-white cursor-pointer">TEST CASES</div>
-                                <div className="px-4 py-2 cursor-pointer hover:text-white transition-colors">CONSOLE</div>
-                            </div>
                             <div className="flex-1 flex p-5 text-sm font-mono">
                                 <div className="flex-1 border-r border-grey-lighter pr-6">
                                     <div className="text-text-secondary text-xs mb-3 font-sans uppercase tracking-wider">Output</div>
