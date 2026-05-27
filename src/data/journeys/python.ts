@@ -92,8 +92,8 @@ export const pythonJourney: Journey = {
             starterCode: '# Calculate and print 5 * 5\n# On the next line, print "Finished"',
             challengeDescription: 'Write a program that outputs the calculation and the completion message.',
             requiredOutput: '25\nFinished',
-            xp: 15, // +5 bonus
-            tokens: 2, // +1 bonus
+            xp: 15,
+            tokens: 2,
             energy: 0,
           }
         },
@@ -256,8 +256,8 @@ export const pythonJourney: Journey = {
             starterCode: 'def sum_even(n):\n    # Calculate and return the sum of even numbers from 1 to n\n    pass\n\n# Print the result of sum_even(5)',
             challengeDescription: 'Write a function sum_even(n) that returns the sum of even numbers from 1 to n. Print the output of sum_even(5) (2 + 4 = 6).',
             requiredOutput: '6',
-            xp: 20, // +5 bonus
-            tokens: 3, // +1 bonus
+            xp: 20,
+            tokens: 3,
             energy: 1,
           }
         },
@@ -396,8 +396,8 @@ export const pythonJourney: Journey = {
             starterCode: 'def add(x, y):\n    return x + y\n\ndef subtract(x, y):\n    return x - y\n\ndef multiply(x, y):\n    return x * y\n\ndef divide(x, y):\n    # Update this function to handle y == 0\n    return x / y\n\nprint(divide(10, 0))',
             challengeDescription: 'Update your divide(x, y) function to return the string "Error: Division by zero" if y is 0. Print the result of divide(10, 0).',
             requiredOutput: 'Error: Division by zero',
-            xp: 25, // +5 bonus
-            tokens: 4, // +1 bonus
+            xp: 25,
+            tokens: 4,
             energy: 2,
           }
         },

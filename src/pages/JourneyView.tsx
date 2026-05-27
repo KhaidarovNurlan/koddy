@@ -123,10 +123,14 @@ export const JourneyView = () => {
             <div className="w-full max-w-[600px] px-4 flex flex-col items-center relative">
                 {journey.chapters.map((chapter, chapterIndex) => {
                     const mainLessons = chapter.lessons.filter(l => l.type !== 'lesson-mastery');
+                    const isAnyLessonActiveInThisChapter = chapter.lessons.some(l => l.id === activeNode);
 
                     return (
-                        <div key={chapter.id} className="w-full mb-16 flex flex-col items-center relative z-10">
-                            {/* Синяя плашка — зафиксирована на месте (не sticky) */}
+                        <div
+                            key={chapter.id}
+                            className={`relative w-full mb-16 flex flex-col items-center ${isAnyLessonActiveInThisChapter ? 'z-50' : 'z-1'
+                                }`}
+                        >
                             <div className="w-full max-w-[600px] mb-10 z-40">
                                 <div className="bg-blue-dark rounded-xl p-4 flex flex-col">
                                     <div className="flex items-center text-white/80 font-bold text-sm mb-1 uppercase tracking-wide">
@@ -208,7 +212,7 @@ export const JourneyView = () => {
                                         <div
                                             key={lesson.id}
                                             className="relative flex flex-col items-center w-full -mb-2"
-                                            style={{ zIndex: isCurrentNodeActive ? 40 : 10 }}
+                                            style={{ zIndex: isCurrentNodeActive ? 100 : 10 }}
                                         >
 
                                             <div className={`relative z-30 ${nodeTransformClass}`}>
@@ -225,7 +229,7 @@ export const JourneyView = () => {
                                                 </button>
 
                                                 {isActive && (
-                                                    <div className="absolute top-[calc(100%+15px)] left-1/2 -translate-x-1/2 bg-grey border-3 border-grey-light rounded-2xl p-5 shadow-2xl z-50 w-[300px]">
+                                                    <div className="absolute top-[calc(100%+15px)] left-1/2 -translate-x-1/2 bg-grey border-3 border-grey-light rounded-2xl p-5 shadow-2xl w-[300px]">
                                                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-grey rotate-45 border-l-3 border-t-3 border-grey-light"></div>
                                                         <div className="relative z-10">
                                                             <h3 className="font-bold text-xl mb-2">{lesson.title}</h3>

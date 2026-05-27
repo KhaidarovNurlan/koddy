@@ -7,6 +7,10 @@ interface User {
     tokens: number;
     energy: number;
     lastEnergyUpdate: string;
+    streak?: number;
+    activeDays?: string;
+    league?: string;
+    rank?: number;
 }
 
 interface AuthContextType {
@@ -59,7 +63,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         fetchUser();
-        // Set up interval to refresh energy every 2 minutes
         const interval = setInterval(() => {
             if (user && user.energy < 5) {
                 fetchUser();

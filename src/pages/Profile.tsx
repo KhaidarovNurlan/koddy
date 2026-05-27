@@ -35,8 +35,8 @@ function MyProfile() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-grey border border-grey-light border-3 rounded-xl p-4 flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2">
-                                <img src="/fire.svg" alt="Streak" className="w-8 h-8 mb-1" />
-                                <span className="font-bold text-md text-white">0</span>
+                                <img src={user?.streak ? "/fire-filled.svg" : "/fire.svg"} alt="Streak" className="w-8 h-8 mb-1" />
+                                <span className="font-bold text-md text-white">{user?.streak ?? 0}</span>
                             </div>
                             <span className="text-md text-text-secondary font-medium">Streak</span>
                         </div>
@@ -49,8 +49,8 @@ function MyProfile() {
                         </div>
                         <div className="bg-grey border border-grey-light border-3 rounded-xl p-4 flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2">
-                                <img src="/locked.svg" alt="League" className="w-7 h-7 mb-1" />
-                                <span className="font-bold text-md text-white">-</span>
+                                <img src={user && user.xp >= 100 && (user as any).league ? `/league_${(user as any).league}.svg` : '/locked.svg'} alt="League" className="w-7 h-7 mb-1" />
+                                <span className="font-bold text-md text-white capitalize">{user && user.xp >= 100 && (user as any).league ? (user as any).league : '-'}</span>
                             </div>
                             <span className="text-md text-text-secondary font-medium">Current league</span>
                         </div>
@@ -102,7 +102,7 @@ function MyProfile() {
                                 <img src="/unknown_badge.svg" alt="Badge" className="w-16 h-16 opacity-50" />
                                 <div>
                                     <h4 className="font-bold text-white text-[15px]">Noobie Portfolio</h4>
-                                    <p className="text-sm text-text-secondary">Finished first project</p>
+                                    <p className="text-sm text-text-secondary">Created first project</p>
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@ function MyProfile() {
                                 <img src="/unknown_badge.svg" alt="Badge" className="w-16 h-16 opacity-50" />
                                 <div>
                                     <h4 className="font-bold text-white text-[15px]">Happy User</h4>
-                                    <p className="text-sm text-text-secondary">Use Koddy for 5 days</p>
+                                    <p className="text-sm text-text-secondary">Achieved 10 Tokens</p>
                                 </div>
                             </div>
                         </div>
@@ -121,24 +121,6 @@ function MyProfile() {
                                 <div>
                                     <h4 className="font-bold text-white text-[15px]">Koddy Store</h4>
                                     <p className="text-sm text-text-secondary">Purchased one product from Koddy store</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <img src="/unknown_badge.svg" alt="Badge" className="w-16 h-16 opacity-50" />
-                                <div>
-                                    <h4 className="font-bold text-white text-[15px]">Starter Achiever</h4>
-                                    <p className="text-sm text-text-secondary">Claim 5 daily goals reward</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <img src="/unknown_badge.svg" alt="Badge" className="w-16 h-16 opacity-50" />
-                                <div>
-                                    <h4 className="font-bold text-white text-[15px]">Novice Challenger</h4>
-                                    <p className="text-sm text-text-secondary">Solve 5 challenges on the first try</p>
                                 </div>
                             </div>
                         </div>
@@ -211,6 +193,33 @@ function MyProfile() {
 }
 
 function SearchFriends() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [users, setUsers] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if (!searchQuery) {
+                setUsers([]);
+                return;
+            }
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`/api/user/search?q=${encodeURIComponent(searchQuery)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setUsers(data.users || []);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const timer = setTimeout(fetchUsers, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     return (
         <div className="flex-1 p-8 w-full max-w-[700px]">
             <Link to="/profile" className="hidden lg:flex items-center gap-2 text-white text-lg mb-6 hover:opacity-80">
@@ -221,27 +230,47 @@ function SearchFriends() {
             <div className="relative mb-6">
                 <input
                     type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by name..."
                     className="w-full bg-grey border-3 border-grey-light rounded-xl py-3 px-4 text-white placeholder-text-secondary outline-none focus:border-blue-light transition-colors"
                 />
                 <img src="/search-white.svg" alt="Search" className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 opacity-75" />
             </div>
-            {/* There will be all relevant users */}
-            {/* <div className="flex flex-col gap-3">
-                    {users.map((user, i) => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-[#242627] border border-[#3b3d3f] rounded-xl hover:border-blue/30 transition-colors">
-                            <div className="flex items-center gap-4">
-                                <Link to={`/user/${user.name}`} className="w-12 h-12 rounded-full overflow-hidden bg-grey-light border-2 border-[#1b1c1d] shrink-0 hover:opacity-80 transition-opacity">
-                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                                </Link>
-                                <div>
-                                    <Link to={`/user/${user.name}`} className="font-bold text-white text-[15px] hover:underline">{user.name}</Link>
-                                    <p className="text-sm text-text-secondary">{user.handle}</p>
+
+            <div className="flex flex-col gap-3">
+                {users.map((user, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 bg-[#242627] border-3 border-grey-light rounded-xl hover:border-blue-light/50 transition-colors">
+                        <div className="flex items-center gap-4">
+                            <Link to={`/user/${user.username}`} className="w-12 h-12 rounded-full overflow-hidden bg-grey-light border-2 border-grey shrink-0 hover:opacity-80 transition-opacity flex items-center justify-center font-bold text-white text-lg capitalize">
+                                {user.username.substring(0, 2)}
+                            </Link>
+                            <div>
+                                <Link to={`/user/${user.username}`} className="font-bold text-white text-[15px] hover:underline block">{user.username}</Link>
+                                <div className="flex items-center gap-4 mt-1 text-xs text-text-secondary">
+                                    <span className="flex items-center gap-1">
+                                        <img src="/xp-dark.svg" className="w-4 h-4" alt="" />
+                                        {user.xp} XP
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <img src={user.streak ? "/fire-filled.svg" : "/fire.svg"} className="w-4 h-4" alt="" />
+                                        {user.streak} days
+                                    </span>
+                                    {user.xp >= 100 && (
+                                        <span className="flex items-center gap-1 capitalize">
+                                            <img src={`/league_${user.league}.svg`} className="w-4 h-4" alt="" />
+                                            {user.league}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div> */}
+                    </div>
+                ))}
+                {searchQuery && users.length === 0 && (
+                    <p className="text-text-secondary text-center text-sm py-4">No users found matching "{searchQuery}"</p>
+                )}
+            </div>
         </div>
     );
 }

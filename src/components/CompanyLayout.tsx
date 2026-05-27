@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const navLinkStyles = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -13,6 +14,7 @@ const navMobileLinkStyles = ({ isActive }: { isActive: boolean }) =>
 
 export function CompanyLayout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { user, logout } = useAuth() || {};
 
     return (
         <>
@@ -30,10 +32,21 @@ export function CompanyLayout() {
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <Link to="/login" className="hover:text-blue transition-colors text-[18px] font-base hidden md:block opacity-90">Login</Link>
-                        <Link to="/" className="hidden md:block btn-shimmer items-center justify-center px-6 text-[14px] transition-all bg-blue font-semibold py-1.5 rounded-xl border-blue-dark shadow-[0_5px_0_0_#264D73] hover:shadow-[0_0px_0_0_#264D73] hover:translate-y-[3px]">
-                            GET STARTED
-                        </Link>
+                        {user ? (
+                            <button
+                                onClick={logout}
+                                className="hidden md:block btn-shimmer items-center justify-center px-6 text-[14px] transition-all bg-[#ff4d4d] hover:bg-[#ff3333] font-semibold py-1.5 rounded-xl border-[#d94040] shadow-[0_5px_0_0_#b33636] hover:shadow-[0_0px_0_0_#b33636] hover:translate-y-[3px]"
+                            >
+                                LOGOUT
+                            </button>
+                        ) : (
+                            <>
+                                <Link to="/login" className="hover:text-blue transition-colors text-[18px] font-base hidden md:block opacity-90">Login</Link>
+                                <Link to="/login" className="hidden md:block btn-shimmer items-center justify-center px-6 text-[14px] transition-all bg-blue font-semibold py-1.5 rounded-xl border-blue-dark shadow-[0_5px_0_0_#264D73] hover:shadow-[0_0px_0_0_#264D73] hover:translate-y-[3px]">
+                                    GET STARTED
+                                </Link>
+                            </>
+                        )}
                         <button className="md:hidden block p-2 -mr-2 text-text-muted hover:text-white transition-colors" onClick={() => setIsMenuOpen(true)}>
                             <img src="/menu-light.svg" alt="Menu" className="w-8 h-8 opacity-80 hover:opacity-100" />
                         </button>
@@ -56,12 +69,23 @@ export function CompanyLayout() {
                     <NavLink to="/ai_assistant" className={navMobileLinkStyles}>AI Assistant</NavLink>
                 </div>
                 <div className="p-6">
-                    <Link to="/" className="block w-full text-center px-4 py-3 bg-blue font-semibold rounded-lg hover:brightness-110 transition-all shadow-lg hover:shadow-blue/20">
-                        Get Started
-                    </Link>
-                    <Link to="/login" className="mt-5 block w-full text-center px-4 py-3 font-base rounded-lg hover:brightness-110 transition-all shadow-lg hover:shadow-blue/20">
-                        I Already Have an Account
-                    </Link>
+                    {user ? (
+                        <button 
+                            onClick={() => { logout?.(); setIsMenuOpen(false); }} 
+                            className="block w-full text-center px-4 py-3 bg-[#ff4d4d] hover:bg-[#ff3333] font-semibold rounded-lg hover:brightness-110 transition-all shadow-lg text-white"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <>
+                            <Link to="/login" className="block w-full text-center px-4 py-3 bg-blue font-semibold rounded-lg hover:brightness-110 transition-all shadow-lg hover:shadow-blue/20">
+                                Get Started
+                            </Link>
+                            <Link to="/login" className="mt-5 block w-full text-center px-4 py-3 font-base rounded-lg hover:brightness-110 transition-all shadow-lg hover:shadow-blue/20">
+                                I Already Have an Account
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
             <Outlet />

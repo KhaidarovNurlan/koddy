@@ -23,7 +23,7 @@ const JOURNEY_ICONS: Record<string, string> = {
 
 const NAV_ITEMS = [
     { name: "Journey", icon: "/journey.svg", path: "/journeys" },
-    { name: "Challenges", icon: "/practice.svg", path: "/challenges" },
+    { name: "Courses", icon: "/practice.svg", path: "/courses" },
     { name: "Projects", icon: "/projects.svg", path: "/projects" },
     { name: "Goals", icon: "/daily-challenges.svg", path: "/goals" },
     { name: "Leaderboard", icon: "/leaderboard.svg", path: "/leaderboard" },
@@ -51,7 +51,7 @@ const EnergyMenuContent = ({ user, refreshUser }: { user: any; refreshUser: () =
 
         const updateTimer = () => {
             const lastUpdate = new Date(user.lastEnergyUpdate).getTime();
-            const nextUpdate = lastUpdate + 2 * 60 * 1000; // 2 minutes in ms
+            const nextUpdate = lastUpdate + 2 * 60 * 1000;
             const now = Date.now();
             const diff = nextUpdate - now;
 
@@ -130,6 +130,77 @@ export const GameLayout = () => {
     const activeJourneyIcon = activeJourney ? JOURNEY_ICONS[activeJourney] || '/no-journey.svg' : '/no-journey.svg';
 
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [leaderboardStatus, setLeaderboardStatus] = useState<{ league: string; rank: number } | null>(null);
+
+    useEffect(() => {
+        if (user && user.xp >= 100) {
+            const fetchStatus = async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const res = await fetch('/api/user/leaderboard', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setLeaderboardStatus({ league: data.league, rank: data.rank });
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+            fetchStatus();
+        } else {
+            setLeaderboardStatus(null);
+        }
+    }, [user?.xp]);
+
+    const [goals, setGoals] = useState<any[]>(DAILY_GOALS_MOCK);
+
+    useEffect(() => {
+        const fetchGoals = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const res = await fetch('/api/user/goals', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setGoals(data.goals || DAILY_GOALS_MOCK);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        if (user) {
+            fetchGoals();
+        }
+    }, [user]);
+
+    const weekDates = useMemo(() => {
+        const today = new Date();
+        const currentDay = today.getDay();
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - currentDay + i);
+            dates.push(d.toISOString().split('T')[0]);
+        }
+        return dates;
+    }, []);
+
+    const activeDaysArray = useMemo(() => {
+        try {
+            return JSON.parse(user?.activeDays || '[]');
+        } catch (e) {
+            return [];
+        }
+    }, [user?.activeDays]);
+
+    const isTodayActive = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        return activeDaysArray.includes(todayStr);
+    }, [activeDaysArray]);
 
     const pageState = useMemo(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -137,7 +208,7 @@ export const GameLayout = () => {
 
         return {
             isJourneysPage: pathname === '/journeys',
-            isChallengesPage: pathname === '/challenges',
+            isCoursesPage: pathname === '/courses',
             isLeaderboardPage: pathname === '/leaderboard',
             isProfileSearchPage: pathname === '/profile' && searchParams.has('search'),
             isProfilePage: pathname === '/profile',
@@ -145,7 +216,7 @@ export const GameLayout = () => {
         };
     }, [location]);
 
-    const { isJourneysPage, isChallengesPage, isLeaderboardPage, isProfileSearchPage, isProfilePage, isGoalsPage } = pageState;
+    const { isJourneysPage, isCoursesPage, isLeaderboardPage, isProfileSearchPage, isProfilePage, isGoalsPage } = pageState;
 
     const toggleMenu = (menuName: string) => {
         setActiveMenu(prev => prev === menuName ? null : menuName);
@@ -183,7 +254,11 @@ export const GameLayout = () => {
                                 }
                             >
                                 <img src={item.icon} alt={item.name} className="w-8 h-8 object-contain" />
-                                <span className="text-[18px]">{item.name}</span>
+                                <div className="flex-1 flex flex-col min-w-0">
+                                    <div className="flex justify-between items-center w-full">
+                                        <span className="text-[18px]">{item.name}</span>
+                                    </div>
+                                </div>
                             </NavLink>
                         )
                     })}
@@ -270,9 +345,8 @@ export const GameLayout = () => {
                                                         key={j}
                                                         to={`/journeys/${j}`}
                                                         onClick={() => setActiveMenu(null)}
-                                                        className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${
-                                                            isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
-                                                        }`}
+                                                        className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
+                                                            }`}
                                                     >
                                                         <div className="flex items-center gap-3">
                                                             <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
@@ -299,8 +373,8 @@ export const GameLayout = () => {
                                     onClick={() => toggleMenu('streak')}
                                     className={`flex items-center justify-center gap-2 px-3 rounded-xl transition-colors h-10 ${activeMenu === 'streak' ? 'bg-grey' : ''}`}
                                 >
-                                    <span>0</span>
-                                    <img src="/fire.svg" alt="Streak" className="w-6 h-6" />
+                                    <span className={user?.streak ? 'text-orange font-bold' : ''}>{user?.streak ?? 0}</span>
+                                    <img src={user?.streak ? "/fire-filled.svg" : "/fire.svg"} alt="Streak" className="w-6 h-6" />
                                 </button>
 
                                 {activeMenu === 'streak' && (
@@ -308,18 +382,29 @@ export const GameLayout = () => {
                                         <div className="bg-orange p-5 pb-6 relative z-0">
                                             <div className="flex justify-between items-start mb-6">
                                                 <div>
-                                                    <h3 className="text-[16px] font-bold text-white mb-1.5">0 day streak</h3>
-                                                    <p className="text-white text-[12px] leading-tight font-medium">Do a lesson today to start a new streak!</p>
+                                                    <h3 className="text-[16px] font-bold text-white mb-1.5">{user?.streak ?? 0} day streak</h3>
+                                                    <p className="text-white text-[12px] leading-tight font-medium">
+                                                        {isTodayActive ? "You kept your streak alive today!" : "Complete a lesson today to keep your streak!"}
+                                                    </p>
                                                 </div>
                                                 <img src="/fire-white.svg" alt="Streak" className="w-14 h-14 opacity-90 drop-shadow-md" />
                                             </div>
                                             <div className="bg-grey-dark/80 rounded-xl p-4 flex justify-between">
-                                                {DAYS_OF_WEEK.map((day, i) => (
-                                                    <div key={i} className="flex flex-col items-center gap-2">
-                                                        <span className="text-[11px] font-bold text-white/50">{day}</span>
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${i === currentDayIndex ? 'bg-grey-dark transition-colors border-2 border-orange' : 'bg-grey-light/50'}`}></div>
-                                                    </div>
-                                                ))}
+                                                {DAYS_OF_WEEK.map((day, i) => {
+                                                    const dateStr = weekDates[i];
+                                                    const isActive = activeDaysArray.includes(dateStr);
+                                                    return (
+                                                        <div key={i} className="flex flex-col items-center gap-2">
+                                                            <span className="text-[11px] font-bold text-white/50">{day}</span>
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isActive
+                                                                ? 'bg-orange text-white'
+                                                                : (i === currentDayIndex ? 'bg-grey-dark text-orange border-2 border-orange' : 'bg-grey-light/50 text-white/30')
+                                                                }`}>
+                                                                {isActive ? '✓' : ''}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -375,7 +460,7 @@ export const GameLayout = () => {
 
                 <Outlet />
 
-                {isJourneysPage || isChallengesPage ? null : (
+                {isJourneysPage || isCoursesPage ? null : (
                     <aside className="hidden lg:flex flex-col w-[300px] pt-8 px-8 xl:px-0 gap-6">
                         <div className="flex justify-between gap-2 text-md font-semibold w-full relative">
 
@@ -394,9 +479,8 @@ export const GameLayout = () => {
                                                 <Link
                                                     key={j}
                                                     to={`/journeys/${j}`}
-                                                    className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${
-                                                        isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
-                                                    }`}
+                                                    className={`flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors font-semibold ${isActive ? 'text-white bg-white/5' : 'text-text-secondary hover:text-white'
+                                                        }`}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <img src={JOURNEY_ICONS[j] || '/no-journey.svg'} className="w-6 h-6" alt="" />
@@ -418,25 +502,36 @@ export const GameLayout = () => {
 
                             <div className="relative group pb-4 -mb-4">
                                 <div className="flex items-center justify-center gap-2 px-3 rounded-xl group-hover:bg-grey transition-colors cursor-pointer h-10">
-                                    <span>0</span>
-                                    <img src="/fire.svg" alt="Streak" className="w-6 h-6" />
+                                    <span className={user?.streak ? 'text-orange font-bold' : ''}>{user?.streak ?? 0}</span>
+                                    <img src={user?.streak ? "/fire-filled.svg" : "/fire.svg"} alt="Streak" className="w-6 h-6" />
                                 </div>
                                 <div className="absolute right-1/2 translate-x-[40px] top-[calc(100%-8px)] w-[320px] bg-grey-dark border-2 border-orange rounded-2xl shadow-2xl z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
                                     <div className="bg-orange p-5 pb-6 relative z-0">
                                         <div className="flex justify-between items-start mb-6">
                                             <div>
-                                                <h3 className="text-xl font-bold text-white mb-1.5">0 day streak</h3>
-                                                <p className="text-white/90 text-sm max-w-[200px] leading-tight font-medium">Do a lesson today to start a new streak!</p>
+                                                <h3 className="text-xl font-bold text-white mb-1.5">{user?.streak ?? 0} day streak</h3>
+                                                <p className="text-white/90 text-sm max-w-[200px] leading-tight font-medium">
+                                                    {isTodayActive ? "You kept your streak alive today!" : "Complete a lesson today to keep your streak!"}
+                                                </p>
                                             </div>
                                             <img src="/fire-white.svg" alt="Streak" className="w-14 h-14 opacity-90 drop-shadow-md" />
                                         </div>
                                         <div className="bg-grey-dark/80 rounded-xl p-4 flex justify-between">
-                                            {DAYS_OF_WEEK.map((day, i) => (
-                                                <div key={i} className="flex flex-col items-center gap-2">
-                                                    <span className="text-[11px] font-bold text-white/50">{day}</span>
-                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${i === currentDayIndex ? 'bg-grey-dark transition-colors border-2 border-orange' : 'bg-grey-light/50'}`}></div>
-                                                </div>
-                                            ))}
+                                            {DAYS_OF_WEEK.map((day, i) => {
+                                                const dateStr = weekDates[i];
+                                                const isActive = activeDaysArray.includes(dateStr);
+                                                return (
+                                                    <div key={i} className="flex flex-col items-center gap-2">
+                                                        <span className="text-[11px] font-bold text-white/50">{day}</span>
+                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isActive
+                                                            ? 'bg-orange text-white'
+                                                            : (i === currentDayIndex ? 'bg-grey-dark text-orange border-2 border-orange' : 'bg-grey-light/50 text-white/30')
+                                                            }`}>
+                                                            {isActive ? '✓' : ''}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>
@@ -476,7 +571,7 @@ export const GameLayout = () => {
                             <div className="bg-grey border-3 border-grey-light rounded-2xl p-5 w-full relative overflow-hidden flex justify-between items-center gap-4">
                                 <div className="flex-1 z-10">
                                     <h3 className="text-[20px] font-bold leading-tight mb-2 text-white">Do lessons. Earn XP. Compete.</h3>
-                                    <p className="text-text-secondary text-[15px] leading-snug font-medium">Earn XP through coding challenges and quizzes, then compete with Coddy players in a weekly leaderboard.</p>
+                                    <p className="text-text-secondary text-[15px] leading-snug font-medium">Earn XP through coding challenges and quizzes, then compete with Coddy players in a leaderboard.</p>
                                 </div>
                                 <div className="w-24 h-24 flex-shrink-0 relative -mr-4 mt-2">
                                     <img src="/leaderboard.svg" alt="Trophy" className="w-full h-full object-contain rotate-335 drop-shadow-lg" />
@@ -513,12 +608,35 @@ export const GameLayout = () => {
                                         <h3 className="text-[18px] font-bold text-white">Leaderboard</h3>
                                         <Link to="/leaderboard" className="text-blue-light text-[16px] font-bold hover:text-white transition-colors">View</Link>
                                     </div>
-                                    <div className="rounded-xl flex items-center gap-4">
-                                        <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
-                                            <img src="/locked.svg" alt="Locked" className="w-full h-full grayscale" />
+                                    {user && user.xp >= 100 ? (
+                                        <div className="rounded-xl flex items-center gap-4">
+                                            <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                                                <img
+                                                    src={leaderboardStatus ? `/league_${leaderboardStatus.league}.svg` : '/leaderboard.svg'}
+                                                    alt="League"
+                                                    className="w-full h-full drop-shadow-md"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col text-sm font-medium">
+                                                <p className="font-bold text-white capitalize leading-tight mb-1">
+                                                    {leaderboardStatus ? `${leaderboardStatus.league} League` : 'Leaderboard'}
+                                                </p>
+                                                <p className="text-text-secondary text-xs mb-0.5">
+                                                    Rank: <span className="text-white font-bold">#{leaderboardStatus?.rank ?? '-'}</span>
+                                                </p>
+                                                <p className="text-text-secondary text-xs">
+                                                    XP: <span className="text-blue-light font-bold">{user.xp} XP</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <p className="text-[16px] font-medium text-white leading-snug">Reach 100 XP to unlock leaderboards!</p>
-                                    </div>
+                                    ) : (
+                                        <div className="rounded-xl flex items-center gap-4">
+                                            <div className="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                                                <img src="/locked.svg" alt="Locked" className="w-full h-full grayscale" />
+                                            </div>
+                                            <p className="text-[16px] font-medium text-white leading-snug">Reach 100 XP to unlock leaderboards!</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="bg-grey border-3 border-grey-light rounded-2xl p-4 w-full">
@@ -527,24 +645,27 @@ export const GameLayout = () => {
                                         <Link to="/goals" className="text-blue-light text-[16px] font-bold hover:text-white transition-colors">View</Link>
                                     </div>
                                     <div className="flex flex-col">
-                                        {DAILY_GOALS_MOCK.map((goal, index) => (
-                                            <div key={index} className="flex justify-between items-center py-3 border-b border-grey-light/20 last:border-0 last:pb-0">
-                                                <div className="flex-1 pr-3">
-                                                    <h4 className="text-[15px] text-white mb-2">{goal.title}</h4>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="flex-1 h-1.5 bg-grey-light rounded-full overflow-hidden">
-                                                            <div className="h-full bg-orange rounded-full" style={{ width: `${(goal.current / goal.total) * 100}%` }}></div>
+                                        {goals.map((goal, index) => {
+                                            const isCompleted = goal.current >= goal.total;
+                                            return (
+                                                <div key={index} className="flex justify-between items-center py-3 border-b border-grey-light/20 last:border-0 last:pb-0">
+                                                    <div className="flex-1 pr-3">
+                                                        <h4 className={`text-[15px] mb-2 font-medium ${isCompleted ? 'text-green' : 'text-white'}`}>{goal.title}</h4>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="flex-1 h-1.5 bg-grey-light rounded-full overflow-hidden">
+                                                                <div className="h-full rounded-full transition-all duration-300 bg-orange" style={{ width: `${Math.min(100, (goal.current / goal.total) * 100)}%` }}></div>
+                                                            </div>
+                                                            <span className="text-[11px] font-bold text-text-secondary min-w-[20px] text-right">
+                                                                {goal.current}/{goal.total}
+                                                            </span>
                                                         </div>
-                                                        <span className="text-[11px] font-bold text-text-secondary min-w-[20px] text-right">
-                                                            {goal.current}/{goal.total}
-                                                        </span>
+                                                    </div>
+                                                    <div className={`w-8 h-8 flex-shrink-0 drop-shadow-md ${isCompleted ? 'brightness-110 scale-105' : 'opacity-80'}`}>
+                                                        <img src={isCompleted ? "/chest-opened.svg" : "/chest-common.svg"} alt="Reward Chest" className="w-full h-full object-contain" />
                                                     </div>
                                                 </div>
-                                                <div className="w-8 h-8 flex-shrink-0 drop-shadow-md">
-                                                    <img src="/chest-common.svg" alt="Reward Chest" className="w-full h-full object-contain" />
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </>

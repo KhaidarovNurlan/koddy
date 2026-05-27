@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import type { Journey, Lesson, Chapter } from '../data/journeys';
 import { allJourneys } from '../data/journeys';
 import { useAuth } from '../context/AuthContext';
+import Editor from '@monaco-editor/react';
 
 const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: number, tokens: number, noMistakes: boolean) => void; onSkip: () => void }) => {
     const [state, setState] = useState<'intro' | 'playing'>('intro');
@@ -422,6 +423,7 @@ export const LessonView = () => {
     const [isRunning, setIsRunning] = useState(false);
     const [submissions, setSubmissions] = useState<any[]>([]);
     const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+    const [hasWrongAttempt, setHasWrongAttempt] = useState(false);
 
     const fetchSubmissions = async () => {
         if (!lesson) return;
@@ -433,7 +435,11 @@ export const LessonView = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setSubmissions(data.submissions || []);
+                const list = data.submissions || [];
+                setSubmissions(list);
+                if (list.some((sub: any) => !sub.passed)) {
+                    setHasWrongAttempt(true);
+                }
             }
         } catch (err) {
             console.error('Failed to fetch submissions:', err);
@@ -447,10 +453,12 @@ export const LessonView = () => {
     };
 
     useEffect(() => {
+        setHasWrongAttempt(false);
         if (lesson?.codingChallenge) {
             setCode(lesson.codingChallenge.starterCode);
             setIsSolutionOpen(false);
             setIsTheoryHidden(false);
+            fetchSubmissions();
         }
 
         if (user && user.energy <= 0) {
@@ -486,8 +494,6 @@ export const LessonView = () => {
         }
     };
 
-    const numLines = code.split('\n').length;
-    const linesArray = Array.from({ length: Math.max(1, numLines) }, (_, i) => i + 1);
 
     const finishLesson = async () => {
         if (!completedData || !lesson || !chapter) return;
@@ -496,7 +502,8 @@ export const LessonView = () => {
             chapterId: chapter.id,
             lessonId: lesson.id,
             xp: completedData.xp,
-            tokens: completedData.tokens
+            tokens: completedData.tokens,
+            noMistakes: completedData.noMistakes
         });
         await consumeEnergy(completedData.energy);
         navigate(`/journeys/${journeyId}`);
@@ -559,7 +566,7 @@ export const LessonView = () => {
             fetchSubmissions();
 
             if (isPassed) {
-                const firstTry = !hintsUsed;
+                const firstTry = !hintsUsed && !isSolutionOpen && !hasWrongAttempt;
                 const challengeXp = lesson.codingChallenge.xp;
                 const challengeEnergy = lesson.codingChallenge.energy !== undefined ? lesson.codingChallenge.energy : 1;
                 const challengeTokens = isSolutionOpen ? 0 : (lesson.codingChallenge.tokens + (firstTry ? 1 : 0));
@@ -569,9 +576,12 @@ export const LessonView = () => {
                     tokens: challengeTokens,
                     energy: challengeEnergy,
                     firstTry,
+                    noMistakes: !hintsUsed && !isSolutionOpen && !hasWrongAttempt,
                     isQuiz: false
                 });
                 setShowCompletionModal(true);
+            } else {
+                setHasWrongAttempt(true);
             }
         } catch (err: any) {
             console.error(err);
@@ -645,12 +655,20 @@ export const LessonView = () => {
                             </svg>
                         </div>
 
+                        {(!user || user.xp < 300) && (
+                            <div className="mb-4 bg-orange/10 border border-orange/20 rounded-lg p-3 text-orange text-sm font-medium">
+                                Earn 300 XP to unlock Projects!
+                            </div>
+                        )}
+
                         <div className="mb-4">
                             <label className="block text-sm font-bold text-white mb-2">Project Name</label>
                             <input
+                                id="save-project-title"
                                 type="text"
                                 className="w-full bg-transparent border border-blue-light rounded-lg p-2.5 text-sm text-white focus:outline-none"
                                 defaultValue={lesson?.title || ''}
+                                disabled={!user || user.xp < 300}
                             />
                         </div>
 
@@ -659,13 +677,15 @@ export const LessonView = () => {
                                 Description <span className="text-text-secondary font-normal">— optional</span>
                             </label>
                             <textarea
+                                id="save-project-desc"
                                 className="w-full bg-[#1c1c1c] border border-grey-light rounded-lg p-3 text-sm text-white h-24 resize-none placeholder-text-secondary focus:outline-none focus:border-blue-light"
                                 placeholder="What does this code do?"
+                                disabled={!user || user.xp < 300}
                             ></textarea>
                         </div>
 
                         <div className="text-[11px] text-text-secondary mb-6">
-                            Language: <span className="font-bold text-white/80">{journey?.language || 'python'}</span> - main.{journey?.language === 'python' ? 'py' : 'js'}
+                            Language: <span className="font-bold text-white/80">{journey?.language || 'python'}</span>
                         </div>
 
                         <div className="flex gap-4 w-full">
@@ -676,11 +696,38 @@ export const LessonView = () => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => {
-                                    alert('Project saved!');
-                                    setShowSaveModal(false);
+                                disabled={!user || user.xp < 300}
+                                onClick={async () => {
+                                    const titleEl = document.getElementById('save-project-title') as HTMLInputElement;
+                                    const descEl = document.getElementById('save-project-desc') as HTMLTextAreaElement;
+                                    const title = titleEl?.value || lesson?.title || 'New Project';
+                                    const description = descEl?.value || '';
+
+                                    try {
+                                        const token = localStorage.getItem('token');
+                                        const res = await fetch('/api/user/projects', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': `Bearer ${token}`
+                                            },
+                                            body: JSON.stringify({
+                                                title,
+                                                description,
+                                                language: journey?.language || 'python',
+                                                code
+                                            })
+                                        });
+                                        if (res.ok) {
+                                            const data = await res.json();
+                                            setShowSaveModal(false);
+                                            navigate(`/projects/${data.project.id}`);
+                                        }
+                                    } catch (err) {
+                                        console.error('Failed to save project', err);
+                                    }
                                 }}
-                                className="flex-1 py-2.5 rounded-xl bg-blue border-b-4 border-blue-dark hover:brightness-110 active:border-b-2 active:translate-y-[2px] transition-all font-bold text-sm text-white uppercase"
+                                className={`flex-1 py-2.5 rounded-xl font-bold text-sm text-white uppercase transition-all border-b-4 ${(!user || user.xp < 300) ? 'bg-grey border-grey-light opacity-50 cursor-not-allowed' : 'bg-blue border-blue-dark hover:brightness-110 active:border-b-2 active:translate-y-[2px]'}`}
                             >
                                 Save
                             </button>
@@ -933,11 +980,11 @@ export const LessonView = () => {
             <div className="flex-1 flex flex-col bg-[#1c1c1c] relative z-0">
                 <div className="h-[61px] bg-grey-dark border-b border-grey-lighter flex justify-end items-center px-6 gap-5 text-sm font-bold shadow-sm z-10">
                     <div className="flex items-center">
-                        <span className="text-white mr-1.5">0</span>
+                        <span className="text-white mr-1.5">{user?.streak ?? 0}</span>
                         <img src="/fire-filled.svg" className="w-4 h-4" alt="streak" />
                     </div>
                     <div className="flex items-center">
-                        <span className="text-white mr-1.5">0</span>
+                        <span className="text-white mr-1.5">{user?.tokens ?? 0}</span>
                         <img src="/token.svg" className="w-4 h-4" alt="tokens" />
                     </div>
                     <div className="flex items-center">
@@ -1001,18 +1048,26 @@ export const LessonView = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex-1 bg-[#1c1c1c] relative font-mono text-sm flex overflow-hidden">
-                            <div className="flex flex-col items-end pr-4 pl-4 pt-4 text-xs text-grey-light border-r border-grey-lighter select-none h-full bg-[#1c1c1c] overflow-hidden">
-                                {linesArray.map(line => (
-                                    <span key={line} className="mb-0.5 leading-6">{line}</span>
-                                ))}
-                            </div>
-                            <div className="flex-1 relative h-full">
-                                <textarea
-                                    className="absolute inset-0 w-full h-full bg-transparent text-white/90 resize-none outline-none border-none p-4 leading-6 font-mono"
+                        <div className="flex-1 bg-[#1c1c1c] relative flex overflow-hidden">
+                            <div className="flex-1 h-full">
+                                <Editor
+                                    height="100%"
+                                    language={journey?.language || 'python'}
+                                    theme="vs-dark"
                                     value={code}
-                                    onChange={(e) => setCode(e.target.value)}
-                                    spellCheck={false}
+                                    onChange={(val) => setCode(val || '')}
+                                    options={{
+                                        fontSize: 14,
+                                        minimap: { enabled: false },
+                                        lineNumbers: 'on',
+                                        scrollBeyondLastLine: false,
+                                        automaticLayout: true,
+                                        scrollbar: {
+                                            vertical: 'auto',
+                                            horizontal: 'auto'
+                                        },
+                                        fontFamily: 'monospace',
+                                    }}
                                 />
                             </div>
 
