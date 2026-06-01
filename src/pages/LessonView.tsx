@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import type { Journey, Lesson, Chapter } from '../data/journeys';
 import { allJourneys } from '../data/journeys';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
+import UserAvatar from '../components/UserAvatar';
 import Editor from '@monaco-editor/react';
 
 const QuizView = ({ quiz, onComplete, onSkip }: { quiz: any; onComplete: (xp: number, tokens: number, noMistakes: boolean) => void; onSkip: () => void }) => {
@@ -425,6 +427,90 @@ export const LessonView = () => {
     const [loadingSubmissions, setLoadingSubmissions] = useState(false);
     const [hasWrongAttempt, setHasWrongAttempt] = useState(false);
 
+    const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+    const [isAILoading, setIsAILoading] = useState(false);
+    
+    const [supportMessage, setSupportMessage] = useState('');
+    const [feedbackType, setFeedbackType] = useState('');
+    const [isContactLoading, setIsContactLoading] = useState(false);
+
+    const handleExplainChallenge = async () => {
+        if (!lesson?.codingChallenge) return;
+        setIsAILoading(true);
+        setAiExplanation(null);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/ai/explain-challenge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    code: lesson.codingChallenge.starterCode,
+                    challengeDescription: lesson.codingChallenge.challengeDescription,
+                    requiredOutput: lesson.codingChallenge.requiredOutput
+                })
+            });
+            const data = await res.json();
+            if (data.explanation) setAiExplanation(data.explanation);
+        } catch (e) {
+            console.error(e);
+            setAiExplanation('Failed to load explanation.');
+        } finally {
+            setIsAILoading(false);
+        }
+    };
+
+    const handleExplainSolution = async () => {
+        if (!lesson?.codingChallenge) return;
+        setIsAILoading(true);
+        setAiExplanation(null);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/ai/explain-solution', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    solution: lesson.codingChallenge.solution,
+                    challengeDescription: lesson.codingChallenge.challengeDescription
+                })
+            });
+            const data = await res.json();
+            if (data.explanation) setAiExplanation(data.explanation);
+        } catch (e) {
+            console.error(e);
+            setAiExplanation('Failed to load explanation.');
+        } finally {
+            setIsAILoading(false);
+        }
+    };
+
+    const handleContactSubmit = async (type: string) => {
+        const msg = type === 'support' ? supportMessage : feedbackType;
+        if (!msg) return;
+        setIsContactLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/user/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    type,
+                    message: msg,
+                    context: `${chapter?.title} - ${lesson?.title}`
+                })
+            });
+            if (res.ok) {
+                toast.success('Sent successfully!');
+                setSupportMessage('');
+                setFeedbackType('');
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error('Failed to send.');
+        } finally {
+            setIsContactLoading(false);
+        }
+    };
+
     const fetchSubmissions = async () => {
         if (!lesson) return;
         setLoadingSubmissions(true);
@@ -812,8 +898,8 @@ export const LessonView = () => {
                                             <li>Press the "Run Code" button to execute it</li>
                                             <li>You should see {lesson.codingChallenge.requiredOutput} appear in the output</li>
                                         </ol>
-                                        <button className="flex flex-row items-center text-blue-light border border-blue-light/30 rounded-lg px-2 gap-2 py-1.5 text-xs font-semibold hover:bg-blue-light/10 transition-colors">
-                                            <img src="/ai-main.svg" className="w-4 h-4" />Explain challenge
+                                        <button disabled={isAILoading} onClick={handleExplainChallenge} className="flex flex-row items-center text-blue-light border border-blue-light/30 rounded-lg px-2 gap-2 py-1.5 text-xs font-semibold hover:bg-blue-light/10 transition-colors disabled:opacity-50">
+                                            <img src="/ai-main.svg" className="w-4 h-4" />{isAILoading ? 'Explaining...' : 'Explain challenge'}
                                         </button>
                                     </div>
 
@@ -864,11 +950,11 @@ export const LessonView = () => {
                                                         </svg>
                                                         Copy to code editor
                                                     </button>
-                                                    <button className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit">
+                                                    <button disabled={isAILoading} onClick={handleExplainSolution} className="flex items-center text-blue-light hover:brightness-125 text-sm transition-colors w-fit disabled:opacity-50">
                                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        Explain solution
+                                                        {isAILoading ? 'Explaining...' : 'Explain solution'}
                                                     </button>
                                                 </div>
                                             </div>
@@ -885,6 +971,15 @@ export const LessonView = () => {
                                         )}
                                     </div>
                                 </>
+                            )}
+                            {aiExplanation && (
+                                <div className="mt-6 bg-[#1c1c1c] border-l-2 border-blue-light p-4 rounded text-sm text-white/90 whitespace-pre-wrap">
+                                    <h4 className="font-bold text-blue-light mb-2 flex justify-between items-center">
+                                        AI Explanation
+                                        <button onClick={() => setAiExplanation(null)} className="text-text-secondary hover:text-white">✕</button>
+                                    </h4>
+                                    {aiExplanation}
+                                </div>
                             )}
                         </>
                     )}
@@ -941,11 +1036,13 @@ export const LessonView = () => {
                                 Context: <span className="font-bold text-white/80">{chapter?.title} - {lesson.title}</span>
                             </p>
                             <textarea
+                                value={supportMessage}
+                                onChange={(e) => setSupportMessage(e.target.value)}
                                 className="w-full bg-transparent border border-grey-light rounded p-3 text-sm text-white/90 mb-4 h-32 resize-none placeholder-text-secondary focus:outline-none focus:border-blue-light"
                                 placeholder="I am missing/need help with..."
                             ></textarea>
-                            <button className="bg-[#247B9E] text-white px-6 py-1.5 rounded-[10px] font-bold text-sm mb-4 hover:brightness-110 active:scale-95 transition-all w-fit">
-                                SEND
+                            <button disabled={isContactLoading || !supportMessage} onClick={() => handleContactSubmit('support')} className="bg-[#247B9E] text-white px-6 py-1.5 rounded-[10px] font-bold text-sm mb-4 hover:brightness-110 active:scale-95 transition-all w-fit disabled:opacity-50">
+                                {isContactLoading ? 'SENDING...' : 'SEND'}
                             </button>
                             <p className="text-[11px] text-text-secondary leading-relaxed pr-2">
                                 We make every effort to respond to all support requests, but <span className="text-[#247B9E] cursor-pointer font-bold">PRO</span> learners receive priority..
@@ -959,18 +1056,18 @@ export const LessonView = () => {
                                 Context: <span className="font-bold text-white/80">{chapter?.title} - {lesson.title}</span>
                             </p>
                             <p className="text-[11px] text-text-secondary mb-2">Feedback type</p>
-                            <select className="w-full bg-transparent border border-grey-light rounded p-2 text-sm text-white/90 mb-6 focus:outline-none focus:border-blue-light cursor-pointer">
-                                <option value="" disabled selected>Select type of feedback...</option>
-                                <option value="1">My answer is correct, but it is not accepted</option>
-                                <option value="2">There is a typo in the lesson/challenge</option>
-                                <option value="3">Some topics are not explained or missing</option>
-                                <option value="4">Coddy solution does not match the challenge</option>
-                                <option value="5">I found a bug or unexpected behaviour</option>
-                                <option value="6">The challenge is too hard</option>
-                                <option value="7">Other</option>
+                            <select value={feedbackType} onChange={(e) => setFeedbackType(e.target.value)} className="w-full bg-transparent border border-grey-light rounded p-2 text-sm text-white/90 mb-6 focus:outline-none focus:border-blue-light cursor-pointer">
+                                <option value="" disabled>Select type of feedback...</option>
+                                <option value="My answer is correct, but it is not accepted">My answer is correct, but it is not accepted</option>
+                                <option value="There is a typo in the lesson/challenge">There is a typo in the lesson/challenge</option>
+                                <option value="Some topics are not explained or missing">Some topics are not explained or missing</option>
+                                <option value="Coddy solution does not match the challenge">Coddy solution does not match the challenge</option>
+                                <option value="I found a bug or unexpected behaviour">I found a bug or unexpected behaviour</option>
+                                <option value="The challenge is too hard">The challenge is too hard</option>
+                                <option value="Other">Other</option>
                             </select>
-                            <button className="bg-[#247B9E] text-white/50 px-6 py-1.5 rounded-[10px] font-bold text-sm hover:brightness-110 active:scale-95 transition-all w-fit cursor-not-allowed">
-                                SEND
+                            <button disabled={isContactLoading || !feedbackType} onClick={() => handleContactSubmit('feedback')} className={`bg-[#247B9E] text-white px-6 py-1.5 rounded-[10px] font-bold text-sm hover:brightness-110 active:scale-95 transition-all w-fit ${!feedbackType ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {isContactLoading ? 'SENDING...' : 'SEND'}
                             </button>
                         </>
                     )}
@@ -991,7 +1088,7 @@ export const LessonView = () => {
                         <span className="text-white mr-1.5">{user?.energy ?? 5}</span>
                         <img src="/energy.svg" className="w-4 h-4" alt="energy" />
                     </div>
-                    <img src="/avatar_placeholder.png" className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
+                    <UserAvatar avatarConfig={user?.avatar} className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
                 </div>
 
                 {quiz ? (
@@ -1072,10 +1169,6 @@ export const LessonView = () => {
                             </div>
 
                             <div className="absolute bottom-4 right-4 flex gap-3 z-10">
-                                <button className="bg-blue text-white px-2 pr-4 gap-2 py-2 rounded-lg flex items-center text-sm font-bold hover:brightness-110 transition-all">
-                                    <img src="/ai-assistant.svg" className="w-6 h-6" />
-                                    Ask AI
-                                </button>
                                 <button
                                     onClick={handleRunCode}
                                     disabled={isRunning}

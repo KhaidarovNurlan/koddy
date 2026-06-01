@@ -1,5 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import UserAvatar from '../components/UserAvatar';
+
+const ALL_TITLES = [
+    { id: 'bit-apprentice', name: "Bit Antroid's Apprentice", icon: '/title_bit_apprentice.svg' },
+    { id: 'code-crusader', name: 'Code Crusader', icon: '/title_code_crusader.svg' },
+    { id: 'loop-legend', name: 'Loop Legend', icon: '/title_loop_legend.svg' },
+    { id: 'byte-master', name: 'Byte Master', icon: '/title_byte_master.svg' },
+    { id: 'algorithm-architect', name: 'Algorithm Architect', icon: '/title_algorithm_architect.svg' },
+    { id: 'coddy-innovator', name: 'Coddy Innovator', icon: '/title_koddy_innovator.svg' },
+    { id: 'code-oracle', name: 'Code Oracle', icon: '/title_code_oracle.svg' },
+    { id: 'quantum-coder', name: 'Quantum Coder', icon: '/title_quantum_coder.svg' },
+];
 
 export const Leaderboard = () => {
     const { user } = useAuth();
@@ -107,6 +119,7 @@ export const Leaderboard = () => {
                         {leaderboardData.leaderboard.map((u: any) => {
                             const isMe = u.id === user.id;
                             const rankIcon = getRankIcon(u.rank);
+                            const titleObj = ALL_TITLES.find(t => t.id === u.activeTitle);
 
                             return (
                                 <div key={u.id} className={`flex items-center gap-4 rounded-2xl p-4 px-6 shadow-sm transition-all
@@ -122,10 +135,18 @@ export const Leaderboard = () => {
                                         )}
                                     </div>
 
-                                    <img src="/avatar_placeholder.png" alt="Avatar" className="w-10 h-10 rounded-full bg-avatar-bg-default border border-grey-light object-cover flex-shrink-0" />
+                                    <UserAvatar avatarConfig={u.avatar} className="w-10 h-10 rounded-full border border-grey-light flex-shrink-0" alt="Avatar" />
 
                                     <div className={`font-semibold text-[15px] flex-1 truncate ${isMe ? 'text-white' : 'text-white/90'}`}>
-                                        {u.username} {isMe && <span className="text-text-secondary text-xs ml-1 font-normal">(You)</span>}
+                                        <div className="flex items-center gap-2">
+                                            {u.username} {isMe && <span className="text-text-secondary text-xs font-normal">(You)</span>}
+                                        </div>
+                                        {titleObj && (
+                                            <div className="flex items-center gap-1 mt-1 opacity-80 bg-blue-light/10 text-blue-light w-fit px-2 py-0.5 rounded-full border border-blue-light/20 text-xs">
+                                                <img src={titleObj.icon} className="w-3.5 h-3.5" alt="" />
+                                                <span className="font-bold">{titleObj.name}</span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className={`font-bold text-[15px] ${isMe ? 'text-blue-light' : 'text-white/80'}`}>

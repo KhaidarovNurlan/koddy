@@ -19,7 +19,7 @@ export function FAQs() {
                     <br />
                     1. Some challenges have a solution that you can reveal.
                     <br />
-                    2. You can press the <span className="underline">"Ask AI"</span> button to gain insight into your code.
+                    2. You can press the <span className="underline">"Explain"</span> button to gain insight into your code.
                     <br />
                     3. You can navigate to support in the left panel to ask for help.
                 </>

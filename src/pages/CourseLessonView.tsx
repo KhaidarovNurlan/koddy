@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import UserAvatar from '../components/UserAvatar';
 
 export function CourseLessonView() {
     const { courseId } = useParams();
@@ -250,7 +251,7 @@ export function CourseLessonView() {
                         <span className="text-white mr-1.5">{user?.energy ?? 5}</span>
                         <img src="/energy.svg" className="w-4 h-4" alt="energy" />
                     </div>
-                    <img src="/avatar_placeholder.png" className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
+                    <UserAvatar avatarConfig={user?.avatar} className="w-7 h-7 rounded-full border border-grey-light" alt="user" />
                 </div>
             </div>
 

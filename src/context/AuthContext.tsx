@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
     id: number;
     email: string;
+    avatar?: string;
     xp: number;
     tokens: number;
     energy: number;
@@ -11,6 +12,12 @@ interface User {
     activeDays?: string;
     league?: string;
     rank?: number;
+    freeChestLastOpened?: string | null;
+    streakFreezes?: number;
+    doubleOrNothingStart?: string | null;
+    xpDoublerUntil?: string | null;
+    titles?: string;
+    activeTitle?: string | null;
 }
 
 interface AuthContextType {
@@ -23,6 +30,7 @@ interface AuthContextType {
     consumeEnergy: (amount?: number) => Promise<boolean>;
     completeLesson: (data: any) => Promise<void>;
     submitTask: (data: any) => Promise<void>;
+    updateAvatar: (avatar: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -121,6 +129,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
     };
 
+    const updateAvatar = async (avatar: string) => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        await fetch('/api/user/avatar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ avatar })
+        });
+        await fetchUser();
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
@@ -129,7 +148,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, journeys, lessons, loading, refreshUser: fetchUser, addJourney, consumeEnergy, completeLesson, submitTask, logout }}>
+        <AuthContext.Provider value={{ user, journeys, lessons, loading, refreshUser: fetchUser, addJourney, consumeEnergy, completeLesson, submitTask, updateAvatar, logout }}>
             {children}
         </AuthContext.Provider>
     );

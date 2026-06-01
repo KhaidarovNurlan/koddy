@@ -98,7 +98,7 @@ export const CreateCourse = () => {
     };
 
     return (
-        <div className="flex-1 p-8 w-full max-w-[800px] mx-auto animate-in fade-in duration-200">
+        <div className="flex-1 p-8 w-full max-w-[700px] animate-in fade-in duration-200">
             <Link to="/courses" className="flex items-center gap-2 text-white text-lg mb-6 hover:opacity-80 w-fit">
                 <img src="/left-white.svg" alt="Back" className="w-6 h-6" />
                 Back

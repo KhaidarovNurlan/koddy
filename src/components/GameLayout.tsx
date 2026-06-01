@@ -275,14 +275,6 @@ export const GameLayout = () => {
                         </button>
 
                         <div className="absolute left-full -bottom-16 mr-8 w-56 bg-grey-dark border-2 border-grey-light rounded-2xl shadow-2xl py-2 z-50 pointer-events-none opacity-0 invisible group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                            <Link to="/" className="flex items-center justify-between px-5 py-2 hover:bg-white/5">
-                                <div className="flex items-center gap-3">
-                                    <img src="/course-white.svg" alt="" className="w-6 h-6" />
-                                    <span>Courses</span>
-                                </div>
-                                <img src="/open-in-new-tab-white.svg" alt="" className="w-4 h-4" />
-                            </Link>
-                            <div className="h-px bg-white/25 my-1 mx-3"></div>
                             <Link to="/notifications" className="block px-5 py-2 hover:bg-white/5">Notifications</Link>
                             <button
                                 type="button"
@@ -314,7 +306,7 @@ export const GameLayout = () => {
                             <Link to="/profile?p=search" className="hover:opacity-80 transition-opacity">
                                 <img src="/search-white.svg" alt="Search friends" className="w-6 h-6 opacity-80" />
                             </Link>
-                            <Link to="/user/nurlan" target="_blank" className="hover:opacity-80 transition-opacity">
+                            <Link to={`/user/${encodeURIComponent(user?.email ? user.email.split('@')[0] : '')}`} target="_blank" className="hover:opacity-80 transition-opacity">
                                 <img src="/resume-white.svg" alt="Public profile" className="w-6 h-6 opacity-80" />
                             </Link>
                         </div>
@@ -581,7 +573,7 @@ export const GameLayout = () => {
                             <div className="bg-grey border-3 border-grey-light rounded-xl p-4 w-full">
                                 <h3 className="text-lg font-bold mb-6 text-white">Actions</h3>
                                 <div className="flex flex-col gap-3">
-                                    <Link to="/user/nurlan" target="_blank" className="flex items-center gap-3">
+                                    <Link to={`/user/${encodeURIComponent(user?.email ? user.email.split('@')[0] : '')}`} target="_blank" className="flex items-center gap-3">
                                         <img src="/resume-white.svg" alt="" className="w-6 h-6" />
                                         <span>Public profile</span>
                                     </Link>

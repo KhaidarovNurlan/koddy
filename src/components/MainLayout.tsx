@@ -52,7 +52,7 @@ export function MainLayout() {
                     <div className="absolute inset-0 opacity-80" style={{ backgroundImage: 'url(/bottom-cta-bg-dark.svg)', backgroundSize: '80%', backgroundRepeat: 'no-repeat', backgroundPosition: 'bottom center' }} />
                     <div className="relative max-w-4xl mx-auto px-6 text-center">
                         <h2 style={{ fontFamily: "'Audiowide', cursive" }} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-12">Learn to code<br />with Koddy</h2>
-                        <Link to="/" className="inline-flex items-center justify-center px-10 py-2.5 bg-grey text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
+                        <Link to="/login" className="inline-flex items-center justify-center px-10 py-2.5 bg-grey text-blue-light font-semibold rounded-xl transition-all border-2 border-grey-light shadow-[0_5px_0_0_#494D50] hover:shadow-[0_0px_0_0_#494D50] hover:translate-y-[3px]">
                             GET STARTED
                         </Link>
                     </div>

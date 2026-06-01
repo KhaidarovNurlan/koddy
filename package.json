@@ -13,6 +13,9 @@
     "db:studio": "drizzle-kit studio --config backend/drizzle.config.ts"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.4.2",
+    "@dicebear/core": "^9.4.2",
+    "@google/genai": "^2.6.0",
     "@hono/node-server": "^2.0.2",
     "@monaco-editor/react": "^4.7.0",
     "bcryptjs": "^3.0.3",
@@ -20,10 +23,12 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.18",
+    "nodemailer": "^8.0.9",
     "postgres": "^3.4.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hot-toast": "^2.6.0",
+    "react-nice-avatar": "^1.5.0",
     "react-router-dom": "^7.13.2"
   },
   "devDependencies": {
@@ -31,6 +36,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^24.12.0",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

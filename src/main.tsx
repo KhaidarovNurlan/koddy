@@ -13,6 +13,7 @@ import { FAQs } from './pages/FAQs';
 import { AIAssistant } from './pages/AIAssistant';
 import { NotFound } from './pages/NotFound';
 import { Login } from './pages/Login';
+import { ResetPassword } from './pages/ResetPassword';
 import { Journeys } from './pages/Journeys';
 import { JourneyView } from './pages/JourneyView';
 import { LessonView } from './pages/LessonView';
@@ -25,6 +26,7 @@ import { Projects } from './pages/Projects';
 import { ProjectPage } from './pages/ProjectPage';
 import { Courses } from './pages/Courses';
 import { CreateCourse } from './pages/CreateCourse';
+import Avatar from './pages/Avatar';
 import { CourseLessonView } from './pages/CourseLessonView';
 import { Store } from './pages/Store';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -62,6 +64,7 @@ createRoot(document.getElementById('root')!).render(
                 <Toaster position="bottom-right" />
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route element={<ProtectedRoute />}>
                         <Route element={<GameLayout />}>
                             <Route path="/journeys" element={<Journeys />} />
@@ -74,6 +77,7 @@ createRoot(document.getElementById('root')!).render(
                             <Route path="/projects" element={<Projects />} />
                             <Route path="/store" element={<Store />} />
                             <Route path="/notifications" element={<Notifications />} />
+                            <Route path="/avatar" element={<Avatar />} />
                         </Route>
                         <Route path="/journeys/:journeyId/lessons/:lessonId" element={<LessonView />} />
                         <Route path="/courses/:courseId" element={<CourseLessonView />} />

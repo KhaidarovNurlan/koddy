@@ -4,6 +4,7 @@ export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
+  avatar: text('avatar'),
   xp: integer('xp').default(0).notNull(),
   tokens: integer('tokens').default(0).notNull(),
   energy: integer('energy').default(5).notNull(),
@@ -12,6 +13,12 @@ export const users = pgTable('users', {
   lastActiveDate: text('last_active_date'),
   activeDays: text('active_days').default('[]').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  freeChestLastOpened: timestamp('free_chest_last_opened'),
+  streakFreezes: integer('streak_freezes').default(0).notNull(),
+  doubleOrNothingStart: text('double_or_nothing_start'),
+  xpDoublerUntil: timestamp('xp_doubler_until'),
+  titles: text('titles').default('[]').notNull(),
+  activeTitle: text('active_title'),
 });
 
 export const userJourneys = pgTable('user_journeys', {

@@ -6,6 +6,8 @@ import { jwt, sign } from 'hono/jwt';
 import { eq, sql } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import * as dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+import { GoogleGenAI } from '@google/genai';
 import { db } from './db/index.js';
 import { users, userJourneys, userLessons, lessonSubmissions, userProjects, courses, courseLessons, userCourseLessons, notifications, userGoals } from './db/schema.js';
 
@@ -25,11 +27,59 @@ if (!JWT_SECRET) {
 
 const api = app.basePath('/api');
 
+let transporter: nodemailer.Transporter | null = null;
+async function initMailer() {
+  try {
+    if (process.env.GMAIL_USERNAME && process.env.GMAIL_APP_PASSWORD) {
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USERNAME.trim(),
+          pass: process.env.GMAIL_APP_PASSWORD.trim()
+        }
+      });
+      console.log('Mailer initialized using Gmail with App Password');
+    } else if (process.env.SMTP_USER) {
+      transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+      console.log('Mailer initialized using Custom SMTP');
+    } else {
+      let testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, 
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      console.log('Created Ethereal Test Account for Emails');
+    }
+  } catch (err) {
+    console.error('Failed to init mailer', err);
+  }
+}
+initMailer();
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'dummy_key_to_avoid_crash' });
+
 api.post('/auth/register', async (c) => {
   try {
     const { email, password } = await c.req.json();
     if (!email || !password) {
       return c.json({ error: 'Email and password are required' }, 400);
+    }
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return c.json({ error: 'Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.' }, 400);
     }
 
     const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -91,7 +141,68 @@ api.get('/journeys/stats', async (c) => {
   }
 });
 
+const passwordResetCodes = new Map<string, string>();
+
+api.post('/auth/forgot-password', async (c) => {
+  try {
+    const { email } = await c.req.json();
+    if (!email) return c.json({ error: 'Email is required' }, 400);
+
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (!user) {
+      return c.json({ success: true, message: 'If the email exists, a reset link was sent.' });
+    }
+
+    const resetToken = Math.random().toString(36).substring(2, 15);
+    passwordResetCodes.set(email, resetToken);
+
+    if (transporter) {
+      const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      const info = await transporter.sendMail({
+        from: `"Koddy" <${process.env.GMAIL_USERNAME || 'noreply@koddy.com'}>`,
+        to: email,
+        subject: "Password Reset Request",
+        text: `Click the following link to reset your password: ${resetUrl}`,
+        html: `<p>Click the following link to reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`,
+      });
+      console.log("Password reset email sent.");
+    }
+
+    return c.json({ success: true, message: 'If the email exists, a reset link was sent.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.post('/auth/reset-password', async (c) => {
+  try {
+    const { email, token, newPassword } = await c.req.json();
+    if (!email || !token || !newPassword) return c.json({ error: 'Missing fields' }, 400);
+
+    const validToken = passwordResetCodes.get(email);
+    if (!validToken || validToken !== token) {
+      return c.json({ error: 'Invalid or expired token' }, 400);
+    }
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return c.json({ error: 'Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.' }, 400);
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await db.update(users).set({ passwordHash }).where(eq(users.email, email));
+    passwordResetCodes.delete(email);
+
+    return c.json({ success: true, message: 'Password has been reset' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
 api.use('/user/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
+api.use('/admin/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
 
 const getTodayAndYesterday = (localDateHeader?: string) => {
   let today = new Date();
@@ -120,8 +231,23 @@ const getTodayAndYesterday = (localDateHeader?: string) => {
 const checkStreakDecay = async (user: any, localDate?: string) => {
   const { todayStr, yesterdayStr } = getTodayAndYesterday(localDate);
   if (user.lastActiveDate && user.lastActiveDate !== todayStr && user.lastActiveDate !== yesterdayStr) {
-    await db.update(users).set({ streak: 0 }).where(eq(users.id, user.id));
-    user.streak = 0;
+    const todayDate = new Date(todayStr);
+    const lastActive = new Date(user.lastActiveDate);
+    const diffTime = Math.abs(todayDate.getTime() - lastActive.getTime());
+    const missedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) - 1;
+
+    if (user.streakFreezes >= missedDays) {
+      await db.update(users).set({
+        streakFreezes: user.streakFreezes - missedDays,
+        lastActiveDate: yesterdayStr
+      }).where(eq(users.id, user.id));
+      user.streakFreezes -= missedDays;
+      user.lastActiveDate = yesterdayStr;
+    } else {
+      await db.update(users).set({ streak: 0, doubleOrNothingStart: null }).where(eq(users.id, user.id));
+      user.streak = 0;
+      user.doubleOrNothingStart = null;
+    }
   }
   return user;
 };
@@ -152,7 +278,25 @@ const updateStreakOnActivity = async (user: any, localDate?: string) => {
     activeDays: JSON.stringify(activeDays)
   }).where(eq(users.id, user.id));
 
-  return { streak: newStreak, lastActiveDate: todayStr, activeDays: JSON.stringify(activeDays) };
+  if (user.doubleOrNothingStart) {
+    const startDate = new Date(user.doubleOrNothingStart);
+    const todayDate = new Date(todayStr);
+    const diffTime = Math.abs(todayDate.getTime() - startDate.getTime());
+    const daysSince = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (daysSince >= 7) {
+      await db.update(users).set({ tokens: user.tokens + 20, doubleOrNothingStart: null }).where(eq(users.id, user.id));
+      user.tokens = (user.tokens || 0) + 20;
+      await db.insert(notifications).values({
+        userId: user.id,
+        title: "Double or Nothing",
+        message: "You maintained your 7-day streak!",
+        reward: "+20 Tokens"
+      });
+      user.doubleOrNothingStart = null;
+    }
+  }
+
+  return { streak: newStreak, lastActiveDate: todayStr, activeDays: JSON.stringify(activeDays), tokens: user.tokens, doubleOrNothingStart: user.doubleOrNothingStart };
 };
 
 const getUserRankAndLeague = async (userId: number) => {
@@ -230,6 +374,49 @@ api.get('/user/me', async (c) => {
     return c.json({ user: safeUser, journeys, lessons: lessonRecords });
   } catch (error) {
     console.error('Me error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.post('/user/avatar', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const { avatar } = await c.req.json();
+
+    if (typeof avatar !== 'string') {
+      return c.json({ error: 'Invalid avatar data' }, 400);
+    }
+
+    await db.update(users).set({ avatar }).where(eq(users.id, payload.id));
+    return c.json({ success: true, avatar });
+  } catch (error) {
+    console.error('Update avatar error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.post('/user/contact', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const { type, message, context } = await c.req.json();
+
+    if (!message) return c.json({ error: 'Message is required' }, 400);
+
+    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
+
+    if (transporter) {
+      const info = await transporter.sendMail({
+        from: `"Koddy App" <${process.env.GMAIL_USERNAME || 'noreply@koddy.com'}>`,
+        to: "nurlankh888@gmail.com",
+        subject: `New ${type || 'Support'} Request from ${user?.email || 'Unknown'}`,
+        text: `Type: ${type}\nUser: ${user?.email}\nContext: ${context || 'N/A'}\n\nMessage:\n${message}`,
+      });
+      console.log("Contact email sent to Admin.");
+    }
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Contact error:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
@@ -392,19 +579,26 @@ api.post('/user/lessons/complete', async (c) => {
       return c.json({ error: 'Not enough energy' }, 400);
     }
 
-    const newXp = user.xp + (xp || 0);
-    const newTokens = user.tokens + (tokens || 0);
+    let actualXpToGive = xp || 0;
+    if (user.xpDoublerUntil && new Date(user.xpDoublerUntil) > new Date()) {
+      actualXpToGive *= 2;
+    }
+    const newXp = user.xp + actualXpToGive;
+    let newTokens = user.tokens + (tokens || 0);
 
     let streakVal = user.streak;
     let lastActiveDateVal = user.lastActiveDate;
     let activeDaysVal = user.activeDays;
+    let doubleOrNothingStartVal = user.doubleOrNothingStart;
 
     const localDate = c.req.header('x-local-date');
-    if (xp && xp > 0) {
+    if (actualXpToGive > 0) {
       const streakUpdate = await updateStreakOnActivity(user, localDate);
       streakVal = streakUpdate.streak;
       lastActiveDateVal = streakUpdate.lastActiveDate;
       activeDaysVal = streakUpdate.activeDays;
+      newTokens = streakUpdate.tokens !== undefined ? streakUpdate.tokens + (tokens || 0) : newTokens;
+      doubleOrNothingStartVal = streakUpdate.doubleOrNothingStart;
     }
 
     await db.update(users).set({
@@ -414,7 +608,8 @@ api.post('/user/lessons/complete', async (c) => {
       lastEnergyUpdate,
       streak: streakVal,
       lastActiveDate: lastActiveDateVal,
-      activeDays: activeDaysVal
+      activeDays: activeDaysVal,
+      doubleOrNothingStart: doubleOrNothingStartVal
     }).where(eq(users.id, user.id));
 
     const existingLesson = await db.select().from(userLessons).where(sql`${userLessons.userId} = ${payload.id} AND ${userLessons.journeyId} = ${journeyId} AND ${userLessons.lessonId} = ${lessonId} AND ${userLessons.chapterId} = ${chapterId}`).limit(1);
@@ -600,7 +795,7 @@ api.get('/courses', async (c) => {
   }
 });
 
-api.post('/courses', async (c) => {
+api.post('/courses', jwt({ secret: JWT_SECRET, alg: 'HS256' }), async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const { title, language, difficulty, lessons: lessonList } = await c.req.json();
@@ -634,7 +829,7 @@ api.post('/courses', async (c) => {
   }
 });
 
-api.get('/courses/:id', async (c) => {
+api.get('/courses/:id', jwt({ secret: JWT_SECRET, alg: 'HS256' }), async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const courseIdVal = parseInt(c.req.param('id'));
@@ -673,7 +868,7 @@ api.get('/courses/:id', async (c) => {
   }
 });
 
-api.post('/courses/lessons/:id/complete', async (c) => {
+api.post('/courses/lessons/:id/complete', jwt({ secret: JWT_SECRET, alg: 'HS256' }), async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
     const lessonIdVal = parseInt(c.req.param('id'));
@@ -697,16 +892,23 @@ api.post('/courses/lessons/:id/complete', async (c) => {
       lastEnergyUpdate = new Date();
     }
 
-    const xpToGive = 10;
+    let xpToGive = 10;
+    if (user.xpDoublerUntil && new Date(user.xpDoublerUntil) > new Date()) {
+      xpToGive *= 2;
+    }
     const tokensToGive = 1;
     const newXp = user.xp + xpToGive;
-    const newTokens = user.tokens + tokensToGive;
+    let newTokens = user.tokens + tokensToGive;
 
     const localDate = c.req.header('x-local-date');
     const streakUpdate = await updateStreakOnActivity(user, localDate);
     const streakVal = streakUpdate.streak;
     const lastActiveDateVal = streakUpdate.lastActiveDate;
     const activeDaysVal = streakUpdate.activeDays;
+    if (streakUpdate.tokens !== undefined) {
+      newTokens = streakUpdate.tokens + tokensToGive;
+    }
+    const doubleOrNothingStartVal = streakUpdate.doubleOrNothingStart;
 
     await db.update(users).set({
       xp: newXp,
@@ -715,7 +917,8 @@ api.post('/courses/lessons/:id/complete', async (c) => {
       lastEnergyUpdate,
       streak: streakVal,
       lastActiveDate: lastActiveDateVal,
-      activeDays: activeDaysVal
+      activeDays: activeDaysVal,
+      doubleOrNothingStart: doubleOrNothingStartVal
     }).where(eq(users.id, user.id));
 
     const existingProgress = await db.select().from(userCourseLessons).where(sql`${userCourseLessons.userId} = ${payload.id} AND ${userCourseLessons.lessonId} = ${lessonIdVal}`).limit(1);
@@ -864,34 +1067,42 @@ api.put('/user/projects/:id', async (c) => {
   }
 });
 
-// ========== TESTING PURPOSE ONLY ==========
-api.post('/user/promo/claim', async (c) => {
+api.post('/admin/award', async (c) => {
   try {
     const payload = c.get('jwtPayload') as any;
-    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
-    if (!user) return c.json({ error: 'User not found' }, 404);
+    if (!payload || payload.email !== 'nurlankh888@gmail.com') {
+      return c.json({ error: 'Unauthorized' }, 403);
+    }
 
-    const newXp = user.xp + 50;
-    const newTokens = user.tokens + 10;
+    const { username, type, amount } = await c.req.json();
+    if (!username || !type || !amount || amount <= 0) {
+      return c.json({ error: 'Invalid parameters' }, 400);
+    }
 
-    const localDate = c.req.header('x-local-date');
-    const streakUpdate = await updateStreakOnActivity(user, localDate);
+    const targetEmail = username + '@';
+    const allUsers = await db.select().from(users);
+    const targetUser = allUsers.find(u => u.email.startsWith(targetEmail) || u.email === username);
 
-    await db.update(users).set({
-      xp: newXp,
-      tokens: newTokens,
-      streak: streakUpdate.streak,
-      lastActiveDate: streakUpdate.lastActiveDate,
-      activeDays: streakUpdate.activeDays
-    }).where(eq(users.id, user.id));
+    if (!targetUser) {
+      return c.json({ error: 'User not found' }, 404);
+    }
 
-    return c.json({ success: true, xp: newXp, tokens: newTokens, streak: streakUpdate.streak });
+    if (type === 'xp') {
+      const newXp = (targetUser.xp || 0) + amount;
+      await db.update(users).set({ xp: newXp }).where(eq(users.id, targetUser.id));
+    } else if (type === 'tokens') {
+      const newTokens = (targetUser.tokens || 0) + amount;
+      await db.update(users).set({ tokens: newTokens }).where(eq(users.id, targetUser.id));
+    } else {
+      return c.json({ error: 'Invalid reward type' }, 400);
+    }
+
+    return c.json({ success: true, message: `Successfully awarded ${amount} ${type} to ${username}` });
   } catch (error) {
-    console.error('Claim promo error:', error);
+    console.error('Admin award error:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
-// ===========================================
 
 api.get('/user/leaderboard', async (c) => {
   try {
@@ -900,7 +1111,9 @@ api.get('/user/leaderboard', async (c) => {
     const allUsers = await db.select({
       id: users.id,
       email: users.email,
-      xp: users.xp
+      xp: users.xp,
+      avatar: users.avatar,
+      activeTitle: users.activeTitle
     }).from(users).orderBy(sql`${users.xp} DESC`);
 
     let userRank = -1;
@@ -957,7 +1170,9 @@ api.get('/user/leaderboard', async (c) => {
         id: u.id,
         username: displayName,
         xp: u.xp,
-        rank
+        rank,
+        avatar: u.avatar,
+        activeTitle: u.activeTitle
       };
     });
 
@@ -984,7 +1199,9 @@ api.get('/user/search', async (c) => {
       id: users.id,
       email: users.email,
       xp: users.xp,
-      streak: users.streak
+      streak: users.streak,
+      avatar: users.avatar,
+      activeTitle: users.activeTitle
     }).from(users).where(sql`LOWER(${users.email}) LIKE ${'%' + q.toLowerCase() + '%'}`).limit(20);
 
     const results = [];
@@ -996,7 +1213,9 @@ api.get('/user/search', async (c) => {
         xp: u.xp,
         streak: u.streak,
         league,
-        rank
+        rank,
+        avatar: u.avatar,
+        activeTitle: u.activeTitle
       });
     }
 
@@ -1023,16 +1242,130 @@ api.get('/user/profile/:username', async (c) => {
     return c.json({
       id: user.id,
       username: username,
+      avatar: user.avatar,
       xp: user.xp,
       streak: user.streak,
       league,
-      rank
+      rank,
+      activeTitle: user.activeTitle
     });
   } catch (error) {
     console.error('Profile fetch error:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
+
+api.post('/user/store/buy', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const { itemId, price } = await c.req.json();
+    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
+    if (!user) return c.json({ error: 'User not found' }, 404);
+
+    if (user.tokens < price) return c.json({ error: 'Not enough tokens' }, 400);
+
+    let updates: any = { tokens: user.tokens - price };
+
+    if (itemId === 'streak-freeze') {
+      updates.streakFreezes = user.streakFreezes + 1;
+    } else if (itemId === 'double-or-nothing') {
+      if (user.doubleOrNothingStart) return c.json({ error: 'Already active' }, 400);
+      const localDate = c.req.header('x-local-date');
+      const { todayStr } = getTodayAndYesterday(localDate);
+      updates.doubleOrNothingStart = todayStr;
+    } else if (itemId === 'xp-surge') {
+      updates.xpDoublerUntil = new Date(Date.now() + 30 * 60 * 1000);
+    } else if (itemId === 'refill-energy') {
+      updates.energy = 5;
+      updates.lastEnergyUpdate = new Date();
+    } else if (itemId === 'title-box') {
+      const allTitles = ['byte-master', 'algorithm-architect', 'coddy-innovator', 'code-oracle', 'quantum-coder'];
+      let userTitles = [];
+      try { userTitles = JSON.parse(user.titles); } catch (e) { }
+      const available = allTitles.filter(t => !userTitles.includes(t));
+      if (available.length === 0) return c.json({ error: 'You own all titles!' }, 400);
+      const randomTitle = available[Math.floor(Math.random() * available.length)];
+      userTitles.push(randomTitle);
+      updates.titles = JSON.stringify(userTitles);
+      await db.update(users).set(updates).where(eq(users.id, user.id));
+      return c.json({ success: true, title: randomTitle });
+    } else {
+      let userTitles = [];
+      try { userTitles = JSON.parse(user.titles); } catch (e) { }
+      if (userTitles.includes(itemId)) return c.json({ error: 'Title already owned' }, 400);
+      userTitles.push(itemId);
+      updates.titles = JSON.stringify(userTitles);
+    }
+
+    await db.update(users).set(updates).where(eq(users.id, user.id));
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Store buy error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.post('/user/store/free-chest', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
+    if (!user) return c.json({ error: 'User not found' }, 404);
+
+    if (user.freeChestLastOpened) {
+      const lastOpened = new Date(user.freeChestLastOpened);
+      if (Date.now() - lastOpened.getTime() < 24 * 60 * 60 * 1000) {
+        return c.json({ error: 'Chest already opened today' }, 400);
+      }
+    }
+
+    const rewardTokens = Math.floor(Math.random() * 6);
+    const newTokens = user.tokens + rewardTokens;
+
+    await db.update(users).set({
+      tokens: newTokens,
+      freeChestLastOpened: new Date()
+    }).where(eq(users.id, user.id));
+
+    if (rewardTokens > 0) {
+      await db.insert(notifications).values({
+        userId: user.id,
+        title: "Free Chest",
+        message: `You found ${rewardTokens} tokens in the chest!`,
+        reward: `+${rewardTokens} Tokens`
+      });
+    }
+
+    return c.json({ success: true, rewardTokens });
+  } catch (error) {
+    console.error('Free chest error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.post('/user/set-title', async (c) => {
+  try {
+    const payload = c.get('jwtPayload') as any;
+    const { titleId } = await c.req.json();
+    const [user] = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
+    if (!user) return c.json({ error: 'User not found' }, 404);
+
+    let userTitles = [];
+    try { userTitles = JSON.parse(user.titles); } catch (e) { }
+
+    const freeTitles = ['bit-apprentice', 'code-crusader', 'loop-legend'];
+    if (titleId && !userTitles.includes(titleId) && !freeTitles.includes(titleId)) {
+      return c.json({ error: 'You do not own this title' }, 400);
+    }
+
+    await db.update(users).set({ activeTitle: titleId || null }).where(eq(users.id, user.id));
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Set title error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+
 
 const port = 3000;
 console.log(`Server is running on http://localhost:${port}...`);

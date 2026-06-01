@@ -1,4 +1,4 @@
-1. Replace the `DATABASE_URL` string in the `.env` file with the correct credentials for your local PostgreSQL database.
+1. Place strings in the `.env` file with the correct data.
 1. Push the schema to your database by running:
     ```bash
     bun run db:push

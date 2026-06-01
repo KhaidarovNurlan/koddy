@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 export function Login() {
     useEffect(() => {
@@ -7,6 +9,7 @@ export function Login() {
     }, []);
 
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,12 +27,40 @@ export function Login() {
                 body: JSON.stringify({ email, password })
             });
             const data = await response.json();
-            
+
             if (!response.ok) {
                 setError(data.error || 'An error occurred');
             } else {
                 localStorage.setItem('token', data.token);
+                await refreshUser();
                 navigate('/journeys');
+            }
+        } catch (err) {
+            setError('Failed to connect to the server');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!email) {
+            setError('Please enter your email address to reset your password');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        try {
+            const response = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                toast.success('A password reset link has been sent to your email.');
+            } else {
+                setError(data.error || 'An error occurred');
             }
         } catch (err) {
             setError('Failed to connect to the server');
@@ -88,7 +119,7 @@ export function Login() {
                     </div>
 
                     {error && <div className="text-red-500 mt-3 text-sm text-center font-medium">{error}</div>}
-                    <button 
+                    <button
                         onClick={handleSubmit}
                         disabled={loading}
                         className="w-full mt-5 inline-flex items-center justify-center px-10 py-2.5 cursor-pointer bg-blue text-white font-semibold rounded-xl transition-all border-blue-dark border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed">
@@ -97,24 +128,11 @@ export function Login() {
 
                     {activeTab === 'login' && (
                         <div className="mt-5 text-center">
-                            <a href="#" className="flex justify-center items-center text-blue-light text-[16px] hover:text-blue">
+                            <a href="#" onClick={handleForgotPassword} className="flex justify-center items-center text-blue-light text-[16px] hover:text-blue">
                                 Forgot password
                             </a>
                         </div>
                     )}
-
-                    <div className="flex items-center my-6">
-                        <div className="flex-1 border-t border-[#3e4249]"></div>
-                        <span className="px-4 text-[16px] uppercase text-text-secondary tracking-wider">OR</span>
-                        <div className="flex-1 border-t border-[#3e4249]"></div>
-                    </div>
-
-                    <div className="flex items-center justify-center">
-                        <button className="inline-flex items-center justify-center px-10 py-3 gap-2 bg-grey text-blue-light rounded-xl transition-all border-grey-light border-[2px] border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px] active:border-b-[2px] active:brightness-90 active:translate-y-[2px]">
-                            <img src="/google.svg" alt="Google" className="w-6 h-6" />
-                            <span className="text-[18px] font-bold">GOOGLE</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div className="text-white flex flex-col justify-center min-w-[300px]">

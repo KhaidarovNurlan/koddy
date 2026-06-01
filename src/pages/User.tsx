@@ -1,5 +1,17 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import UserAvatar from '../components/UserAvatar';
+
+const ALL_TITLES = [
+    { id: 'bit-apprentice', name: "Bit Antroid's Apprentice", icon: '/title_bit_apprentice.svg' },
+    { id: 'code-crusader', name: 'Code Crusader', icon: '/title_code_crusader.svg' },
+    { id: 'loop-legend', name: 'Loop Legend', icon: '/title_loop_legend.svg' },
+    { id: 'byte-master', name: 'Byte Master', icon: '/title_byte_master.svg' },
+    { id: 'algorithm-architect', name: 'Algorithm Architect', icon: '/title_algorithm_architect.svg' },
+    { id: 'coddy-innovator', name: 'Coddy Innovator', icon: '/title_koddy_innovator.svg' },
+    { id: 'code-oracle', name: 'Code Oracle', icon: '/title_code_oracle.svg' },
+    { id: 'quantum-coder', name: 'Quantum Coder', icon: '/title_quantum_coder.svg' },
+];
 
 export function User() {
     const { username } = useParams();
@@ -9,7 +21,7 @@ export function User() {
 
     useEffect(() => {
         document.title = `${username}'s Profile - Koddy`;
-        
+
         const fetchProfile = async () => {
             try {
                 setLoading(true);
@@ -51,20 +63,37 @@ export function User() {
         );
     }
 
+    const titleObj = ALL_TITLES.find(t => t.id === profile?.activeTitle);
+    let avatarBgColor = '#2087B3';
+    if (profile?.avatar) {
+        try {
+            const parsed = JSON.parse(profile.avatar);
+            if (parsed.bgColor) {
+                avatarBgColor = parsed.bgColor;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     return (
         <div className="mb-8 bg-grey-dark py-12 px-6 flex items-center justify-center">
             <div className="flex-1 p-8 max-w-[700px] overflow-y-auto">
-                <div className="bg-avatar-bg-default h-72 rounded-2xl relative">
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-60 h-60 bg-avatar-bg-default rounded-[40px] flex items-center justify-center">
-                        <img
-                            src="/avatar_placeholder.png"
-                            alt="Avatar Placeholder"
-                            className="w-full h-full object-cover"
-                        />
+                <div className="h-72 rounded-2xl relative transition-colors duration-300" style={{ backgroundColor: avatarBgColor }}>
+                    {titleObj && (
+                        <div className="absolute top-4 left-4 w-16 h-16 rounded-xl flex items-center justify-center bg-black/20 border border-white/20 z-10">
+                            <img src={titleObj.icon} alt={titleObj.name} className="w-12 h-12" title={titleObj.name} />
+                        </div>
+                    )}
+
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-60 h-60 flex items-center justify-center z-0">
+                        <div className="w-56 h-56 shadow-2xl rounded-full bg-white/10 backdrop-blur-sm p-3.5 flex items-center justify-center">
+                            <UserAvatar avatarConfig={profile.avatar} className="w-full h-full" alt="User Avatar" />
+                        </div>
                     </div>
                 </div>
                 <div className="bg-grey-dark rounded-b-2xl pt-8 pb-6 px-8 mb-6">
-                    <h2 className="text-2xl font-bold text-white mb-6 capitalize">{profile.username}</h2>
+                    <h2 className={`text-2xl font-bold text-white capitalize mb-6`}>{profile.username}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-grey border border-grey-light border-3 rounded-xl p-4 flex flex-col items-center justify-center">
                             <div className="flex items-center gap-2">
