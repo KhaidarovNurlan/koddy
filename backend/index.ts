@@ -203,6 +203,7 @@ api.post('/auth/reset-password', async (c) => {
 
 api.use('/user/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
 api.use('/admin/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
+api.use('/ai/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
 
 const getTodayAndYesterday = (localDateHeader?: string) => {
   let today = new Date();
@@ -1365,7 +1366,66 @@ api.post('/user/set-title', async (c) => {
   }
 });
 
+api.post('/ai/explain-challenge', async (c) => {
+  try {
+    const { code, challengeDescription, requiredOutput } = await c.req.json();
+    
+    const prompt = `You are an expert programming tutor. Explain this coding challenge and how to approach it.
+    
+Challenge Description:
+${challengeDescription}
 
+Starter Code:
+\`\`\`
+${code}
+\`\`\`
+
+Expected Output:
+${requiredOutput}
+
+Please provide a clear, encouraging, and helpful explanation of what the challenge asks for and the steps/logic needed to solve it. Do not write the full code solution for the user, but guide them on how to write it. Keep the explanation concise and formatted in Markdown.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    const explanation = response.text || 'Could not generate explanation.';
+    return c.json({ explanation });
+  } catch (error: any) {
+    console.error('Explain challenge error:', error);
+    return c.json({ error: 'Internal server error', details: error.message }, 500);
+  }
+});
+
+api.post('/ai/explain-solution', async (c) => {
+  try {
+    const { solution, challengeDescription } = await c.req.json();
+    
+    const prompt = `You are an expert programming tutor. Explain this coding solution in a clear and educational way.
+    
+Challenge Description:
+${challengeDescription}
+
+Solution Code:
+\`\`\`
+${solution}
+\`\`\`
+
+Please explain step-by-step how this solution works, why it is correct, and any key concepts or programming patterns used in it. Keep the explanation concise and formatted in Markdown.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    const explanation = response.text || 'Could not generate explanation.';
+    return c.json({ explanation });
+  } catch (error: any) {
+    console.error('Explain solution error:', error);
+    return c.json({ error: 'Internal server error', details: error.message }, 500);
+  }
+});
 
 const port = 3000;
 console.log(`Server is running on http://localhost:${port}...`);

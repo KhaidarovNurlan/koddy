@@ -295,11 +295,6 @@ export const ProjectPage = () => {
                     <div className="h-[250px] bg-[#1e1e1e] border-t border-grey-lighter flex flex-col shadow-inner z-10">
                         <div className="h-8 bg-[#252526] flex items-center justify-between px-4 border-b border-grey-lighter shrink-0">
                             <span className="text-[11px] font-bold text-white/70 tracking-wider uppercase">Console</span>
-                            <div className="flex items-center gap-2">
-                                <svg className="w-4 h-4 text-text-secondary hover:text-white cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                </svg>
-                            </div>
                         </div>
                         <div className="flex-1 p-3 overflow-y-auto">
                             {output ? (

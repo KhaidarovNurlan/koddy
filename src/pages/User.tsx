@@ -118,13 +118,6 @@ export function User() {
                         </div>
                     </div>
                 </div>
-
-                <div className="bg-grey border-3 border-grey-light rounded-2xl p-4">
-                    <h3 className="font-bold text-lg text-white">Badges</h3>
-                    <div className="h-1 bg-grey-light my-4" />
-                    <div className="flex flex-col gap-4 h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-                    </div>
-                </div>
             </div>
         </div>
     );
