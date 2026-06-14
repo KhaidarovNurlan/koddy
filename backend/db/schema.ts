@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, integer, boolean, unique } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -26,7 +26,9 @@ export const userJourneys = pgTable('user_journeys', {
   userId: integer('user_id').references(() => users.id).notNull(),
   journeyId: text('journey_id').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  unique('user_journey_unique').on(table.userId, table.journeyId)
+]);
 
 export const userLessons = pgTable('user_lessons', {
   id: serial('id').primaryKey(),

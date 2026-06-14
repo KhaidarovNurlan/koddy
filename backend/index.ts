@@ -131,12 +131,24 @@ api.get('/journeys/stats', async (c) => {
   try {
     const stats = await db.select({
       journeyId: userJourneys.journeyId,
-      count: sql<number>`count(${userJourneys.id})`.mapWith(Number)
+      count: sql<number>`count(distinct ${userJourneys.userId})`.mapWith(Number)
     }).from(userJourneys).groupBy(userJourneys.journeyId);
 
     return c.json({ stats });
   } catch (error) {
     console.error('Stats error:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+api.get('/users/count', async (c) => {
+  try {
+    const [result] = await db.select({
+      count: sql<number>`count(${users.id})`.mapWith(Number)
+    }).from(users);
+    return c.json({ count: result?.count || 0 });
+  } catch (error) {
+    console.error('Count users error:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
@@ -432,7 +444,11 @@ api.post('/user/journeys', async (c) => {
     const existing = await db.select().from(userJourneys).where(sql`${userJourneys.userId} = ${payload.id} AND ${userJourneys.journeyId} = ${journeyId}`).limit(1);
 
     if (existing.length === 0) {
-      await db.insert(userJourneys).values({ userId: payload.id, journeyId });
+      try {
+        await db.insert(userJourneys).values({ userId: payload.id, journeyId });
+      } catch (error) {
+        // Ignore unique constraint violations due to concurrent requests
+      }
     }
 
     return c.json({ success: true });

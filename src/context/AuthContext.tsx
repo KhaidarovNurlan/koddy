@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 interface User {
     id: number;
@@ -79,15 +79,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => clearInterval(interval);
     }, [user?.energy]);
 
+    const pendingJourneys = useRef<Set<string>>(new Set());
+
     const addJourney = async (journeyId: string) => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        await fetch('/api/user/journeys', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ journeyId })
-        });
-        await fetchUser();
+        if (pendingJourneys.current.has(journeyId) || journeys.includes(journeyId)) return;
+        pendingJourneys.current.add(journeyId);
+
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            await fetch('/api/user/journeys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ journeyId })
+            });
+            await fetchUser();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            pendingJourneys.current.delete(journeyId);
+        }
     };
 
     const consumeEnergy = async (amount: number = 1) => {

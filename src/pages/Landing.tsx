@@ -282,6 +282,18 @@ function Leaderboard() {
 export function Landing() {
     const { user, journeys, loading } = useAuth();
     const navigate = useNavigate();
+    const [userCount, setUserCount] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetch('/api/users/count')
+            .then(res => res.json())
+            .then(data => {
+                if (typeof data.count === 'number') {
+                    setUserCount(data.count);
+                }
+            })
+            .catch(err => console.error('Error fetching user count:', err));
+    }, []);
 
     useEffect(() => {
         if (!loading && user) {
@@ -370,7 +382,7 @@ export function Landing() {
                         </h1>
 
                         <p className="text-text-secondary text-base md:text-lg">
-                            Join over 999,999,999 <span style={{ fontFamily: "'Audiowide', cursive" }}>kodders</span>
+                            Join over {userCount !== null ? userCount.toLocaleString() : '0'} <span style={{ fontFamily: "'Audiowide', cursive" }}>kodders</span>
                         </p>
 
                         <div className="flex flex-col gap-3 mt-2 w-full max-w-sm">

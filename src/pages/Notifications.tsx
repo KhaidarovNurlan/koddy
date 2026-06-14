@@ -39,7 +39,7 @@ export const Notifications = () => {
 
     return (
         <div className="flex-1 p-8 w-full max-w-[700px] animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-10">
+            <div className="flex justify-between items-center mb-8">
                 <h1 className="text-[20px] font-bold text-white">Notifications</h1>
                 {notifications.length > 0 && (
                     <span className="text-[13px] text-text-secondary font-bold">
@@ -72,8 +72,8 @@ export const Notifications = () => {
                         });
 
                         return (
-                            <div 
-                                key={item.id} 
+                            <div
+                                key={item.id}
                                 className="flex items-start gap-4 p-5 rounded-2xl bg-grey border-2 border-grey-light hover:border-blue-light/30 transition-all duration-200"
                             >
                                 <div className="w-10 h-10 rounded-xl bg-orange/10 flex items-center justify-center flex-shrink-0 text-orange">
