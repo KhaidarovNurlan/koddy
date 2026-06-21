@@ -169,7 +169,7 @@ api.post('/auth/forgot-password', async (c) => {
     passwordResetCodes.set(email, resetToken);
 
     if (transporter) {
-      const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      const resetUrl = `https://koddy.onrender.com/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
       const info = await transporter.sendMail({
         from: `"Koddy" <${process.env.GMAIL_USERNAME || 'noreply@koddy.com'}>`,
         to: email,
