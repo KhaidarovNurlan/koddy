@@ -53,7 +53,17 @@ window.fetch = async (input, init) => {
         (init.headers as Record<string, string>)['x-local-date'] = localDate;
     }
 
-    return originalFetch(input, init);
+    let targetInput = input;
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    if (apiBase) {
+        if (typeof targetInput === 'string' && targetInput.startsWith('/api/')) {
+            targetInput = `${apiBase}${targetInput}`;
+        } else if (targetInput instanceof URL && targetInput.pathname.startsWith('/api/')) {
+            targetInput = new URL(`${apiBase}${targetInput.pathname}${targetInput.search}${targetInput.hash}`);
+        }
+    }
+
+    return originalFetch(targetInput, init);
 };
 
 createRoot(document.getElementById('root')!).render(
