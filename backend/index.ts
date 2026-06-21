@@ -15,6 +15,10 @@ dotenv.config();
 
 const app = new Hono();
 
+app.get('/', (c) => {
+  return c.text('Koddy API Server is Live!');
+});
+
 app.use('*', logger());
 
 app.use('/*', cors());
@@ -1443,10 +1447,12 @@ Please explain step-by-step how this solution works, why it is correct, and any 
   }
 });
 
-const port = 3000;
-console.log(`Server is running on http://localhost:${port}...`);
+const port = parseInt(process.env.PORT || '3000');
+console.log(`Server is trying to start on port ${port}...`);
 
 serve({
   fetch: app.fetch,
-  port
+  port: port
+}, (info) => {
+  console.log(`Server is running on http://0.0.0.0:${info.port}`);
 });
