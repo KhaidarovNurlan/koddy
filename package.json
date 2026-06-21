@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:backend": "bun --watch backend/index.ts",
+    "start:backend": "bun backend/index.ts",
     "db:push": "drizzle-kit push --config backend/drizzle.config.ts",
     "db:studio": "drizzle-kit studio --config backend/drizzle.config.ts"
   },
